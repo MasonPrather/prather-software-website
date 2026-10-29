@@ -1,0 +1,4 @@
+---
+import Base from '../layouts/Base.astro';import {services} from '../data';
+---
+<Base title="Services | Prather Software"><section class="pagehero"><div class="wrap"><div class="eyebrow">SERVICES</div><h1>Complete software engineering, tailored to your business.</h1><p>From individual components to full-lifecycle delivery, we design, develop, integrate, and maintain the technology your business needs.</p></div></section><section class="section"><div class="wrap"><div class="grid">{services.map(([name,desc])=><article class="card"><h3>{name}</h3><p>{desc}</p></article>)}</div><p style="margin-top:35px"><a class="button" href="/contact">Discuss Your Project ↗</a></p></div></section></Base>

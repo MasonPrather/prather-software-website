@@ -1,0 +1,8 @@
+---
+import Base from '../../layouts/Base.astro';
+import {getCollection,render} from 'astro:content';
+export async function getStaticPaths(){return (await getCollection('work',({data})=>data.published)).map(entry=>({params:{slug:entry.id},props:{entry}}));}
+const {entry}=Astro.props;
+const {Content}=await render(entry);
+---
+<Base title={`${entry.data.title} | Prather Software`} description={entry.data.summary}><section class="pagehero"><div class="wrap"><div class="eyebrow">{entry.data.category}</div><h1>{entry.data.title}</h1><p>{entry.data.summary}</p></div></section><section class="section"><div class="wrap detail"><p><strong>Contribution:</strong> {entry.data.role}</p><p><strong>Outcome:</strong> {entry.data.outcome}</p><div>{entry.data.technologies.map(t=><span class="tag">{t}</span>)}</div><div class="prose"><Content/></div><a href="/work">← Back to Our Work</a></div></section></Base><style>.detail{max-width:780px}.detail p{line-height:1.8}.prose{margin:40px 0}</style>

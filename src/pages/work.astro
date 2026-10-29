@@ -1,0 +1,5 @@
+---
+import Base from '../layouts/Base.astro';import {getCollection} from 'astro:content';
+const projects=await getCollection('work',({data})=>data.published);
+---
+<Base title="Our Work | Prather Software"><section class="pagehero"><div class="wrap"><div class="eyebrow">OUR WORK</div><h1>Engineering experience, transparently presented.</h1><p>Selected academic research, prior professional engineering, and independent work. These are not presented as commercial client engagements.</p></div></section><section class="section"><div class="wrap"><div class="grid">{projects.map(project=><a class="card" href={`/work/${project.id}/`}><div class="eyebrow">{project.data.category}</div><h3>{project.data.title} ↗</h3><p>{project.data.summary}</p></a>)}</div><h2 style="margin-top:70px">Clients</h2><p class="muted">Verified Prather Software client engagements will appear here when available and approved for publication.</p></div></section></Base>
