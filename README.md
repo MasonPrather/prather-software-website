@@ -1,57 +1,60 @@
-# Prather Software — Website Foundation
+# Prather Software LLC website
 
-Astro static-first website prototype for prathersoftware.com. The site presents B2B software engineering and B2C software/game publishing as complementary business lines.
+Astro and TypeScript website for [prathersoftware.com](https://prathersoftware.com), presenting client software engineering alongside independent software and game publishing, including NinjaDawg Studios. Imported from the supplied Milestone 2 archive and extended on `feature/milestone-2-website`. The original repository README title is incorporated here; the initial Git history is preserved.
 
-## Development
+## Local development
 
-```bash
-npm install
+Use Node 24 LTS (`nvm use`) and npm. Local validation also works on the installed Node 25 runtime. Astro was upgraded from the archive's Astro 5 range to patched Astro 7 after the initial dependency audit found security advisories. The lockfile is committed.
+
+```sh
+npm ci
 npm run dev
+```
+
+Astro serves the public site. It does not implement the contact API. To exercise the Cloudflare runtime locally, build first and run Wrangler:
+
+```sh
 npm run build
+npm run worker:dev
 ```
 
-## Status
+Contact remains unavailable by default. Local environment examples contain configuration placeholders only. Never put real credentials into tracked files.
 
-Milestone 1 prototype. **Not production-ready yet.** Contact form is intentionally disabled until Cloudflare Turnstile, server-side validation, rate limiting, and transactional email delivery are configured. Portfolio entries are prior research/professional experience, not claimed commercial clients. Product catalog is in development. Privacy copy is provisional. Branding uses a placeholder lettermark, not a finalized logo.
+## Verification
 
-## Next engineering tasks
-
-1. Confirm brand assets and case-study publication permissions.
-2. Convert project/product content to typed Astro Content Collections.
-3. Add individual case study and product detail routes with verified content.
-4. Implement secure contact endpoint with Turnstile and email delivery.
-5. Add sitemap, social sharing images, structured data, accessibility and performance tests.
-6. Add Cloudflare Workers adapter and Wrangler configuration; deploy to staging before production.
-
-## Agent workstreams
-
-- Frontend agent: componentize page sections, mobile navigation, accessibility tests.
-- Content agent: verified project attribution, SEO, product schemas.
-- Infrastructure agent: Cloudflare Workers, DNS, Turnstile, mail integration, staging.
-- QA agent: browser/device testing, WCAG 2.2 AA audit, security and performance gates.
-
-
-## Milestone 2 additions
-
-- Astro content collections in `src/content.config.ts` for work, software and games.
-- Case-study detail routes at `/work/[slug]/`.
-- Software and game detail route templates; unpublished products are not shown.
-- Sitemap and robots.txt routes.
-- `AGENTS.md` for parallel coding-agent assignments and guardrails.
-
-Run `npm install && npm run build` to validate before deployment. npm install was unavailable in the execution environment, so the build has not yet been verified.
-
-## GitHub setup
-
-Create a private repository named `prather-software-website` in your GitHub account, then run:
-
-```bash
-git init
-git add .
-git commit -m "feat: establish Prather Software website milestone 2"
-git branch -M main
-git remote add origin git@github.com:MasonPrather/prather-software-website.git
-git push -u origin main
+```sh
+npx playwright install chromium
+npm run verify
 ```
 
-Do not run the remote commands until the repository exists and your GitHub authentication is configured.
+`verify` runs Astro and Worker type checks, a static build, contact security unit tests, local link and sitemap checks, local Worker runtime checks, isolated product fixture builds, browser/WCAG checks at 375/768/1440 px plus a 320 px overflow check, and a Wrangler packaging dry run. `npm run test:e2e` expects an existing `dist/` build and starts Astro preview automatically. The active-form browser fixture builds to ignored `.test-dist/`; Turnstile and mail responses are mocked, and the production `dist/` remains disabled. Empty product collection warnings are expected until verified products exist. GitHub Actions runs these gates and an advisory audit on pushes and pull requests. It has no deployment job and needs no deployment credentials.
+
+Automated accessibility checks do not establish complete WCAG conformance. Manual assistive technology review and real device/browser coverage remain required before production signoff.
+
+## Structure
+
+- `src/layouts`, `src/components`, `src/styles`: shared design system, navigation, metadata, reusable page sections.
+- `src/pages`: static page routes, collection detail templates, sitemap and robots endpoints.
+- `src/content.config.ts`, `src/content`: typed work/software/game collections. Only `published: true` entries generate public routes.
+- `src/lib/contact.ts`, `src/scripts/contact.ts`: shared validation/categories and accessible contact interaction.
+- `worker/`, `wrangler.jsonc`: a small Cloudflare Worker serving Astro's `dist/` assets and `/api/contact`.
+- `tests/`, `scripts/`: security, browser, accessibility, link and publication-gate regression checks.
+- `docs/cloudflare-staging.md`: environment, Turnstile, mail delivery, and staging checklist.
+
+The site remains static-first. Plain CSS and small browser scripts keep the design maintainable without a UI framework or unnecessary Tailwind dependency. No database, R2 bucket, analytics, or tracking library is needed for this milestone. An Astro server adapter is unnecessary: Cloudflare serves the generated static assets and the standalone Worker handles the contact route.
+
+## Content and publication
+
+The three supplied portfolio entries describe **academic research or prior professional experience**, not Prather Software clients. Review publication permissions before expanding details. No clients, testimonials, staff, product releases, pricing, or partnerships have been invented. Public product catalogs intentionally show an honest empty state until verified entries exist. Draft collection entries default to unpublished; published releases require an HTTPS store link, verified pricing (including Free), and platform metadata. Test products exist only in an automatically cleaned temporary directory.
+
+The geometric lettermark and social graphic are provisional identity assets, not a claim of finalized branding. Founder information and the NinjaDawg label relationship come from the supplied source.
+
+## Contact and deployment gates
+
+The contact implementation validates and limits requests server-side, checks same-origin submissions, verifies Turnstile action and hostname, uses a native Cloudflare rate-limit binding, and submits through the fixed Resend API. A successful response requires an accepted provider response with a message ID; acceptance does not imply inbox delivery. Automated tests mock external providers and do not prove real delivery.
+
+The UI, server enable flag, and delivery-verification flag default off. Configure real Turnstile keys/allowed hosts, a verified sender and recipient, and private environment secrets; verify a real accepted message and token replay rejection in staging before activating the form. Resend is an unconfigured implementation choice; no account, paid plan, or remote resource has been created.
+
+No production DNS, custom domain, or deployment is configured by this change. Review [the staging guide](docs/cloudflare-staging.md) and obtain approval before production deployment or DNS changes. Contact/privacy text and retention practices must match the selected live configuration before activation.
+
+See [the verification record](docs/milestone-2-verification.md) for tested scope and remaining production checks.
