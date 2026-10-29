@@ -1,7 +1,16 @@
 ---
-import Base from '../../../layouts/Base.astro';import {getCollection,render} from 'astro:content';
-const category='software';
-export async function getStaticPaths(){const category='software';return (await getCollection(category,({data})=>data.published)).map(entry=>({params:{slug:entry.id},props:{entry}}));}
-const {entry}=Astro.props;const {Content}=await render(entry);
+import type { CollectionEntry } from 'astro:content';
+import { getCollection } from 'astro:content';
+import ProductDetail from '../../../components/ProductDetail.astro';
+export async function getStaticPaths() {
+  return (await getCollection('software', ({ data }) => data.published)).map(
+    (entry) => ({ params: { slug: entry.id }, props: { entry } }),
+  );
+}
+interface Props {
+  entry: CollectionEntry<'software'>;
+}
+const { entry } = Astro.props;
 ---
-<Base title={`${entry.data.title} | Prather Software`} description={entry.data.summary}><section class="pagehero"><div class="wrap"><div class="eyebrow">{entry.data.status}</div><h1>{entry.data.title}</h1><p>{entry.data.summary}</p></div></section><section class="section"><div class="wrap"><p><strong>Platforms:</strong> {entry.data.platforms.join(', ')}</p>{entry.data.price&&<p><strong>Price:</strong> {entry.data.price}</p>}<Content/>{entry.data.status==='Released'&&entry.data.storeUrl&&<a class="button" href={entry.data.storeUrl} rel="noopener noreferrer">View product ↗</a>}<p><a href={`/products/${category}`}>← Back to catalog</a></p></div></section></Base>
+
+<ProductDetail entry={entry} category="software" />

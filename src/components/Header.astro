@@ -1,0 +1,383 @@
+---
+const pathname = Astro.url.pathname.replace(/\/$/, '') || '/';
+const current = (href: string) =>
+  pathname === href ? ('page' as const) : undefined;
+---
+
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="/" aria-label="Prather Software home">
+      <span class="brand-mark" aria-hidden="true">
+        P<span>.</span>
+      </span>
+      <span class="brand-wordmark">
+        PRATHER <span>SOFTWARE</span>
+      </span>
+    </a>
+    <button
+      class="menu-toggle"
+      type="button"
+      aria-expanded="false"
+      aria-controls="primary-navigation"
+    >
+      <span>Menu</span>
+      <svg
+        width="20"
+        height="20"
+        viewBox="0 0 20 20"
+        fill="none"
+        aria-hidden="true"
+      >
+        <path d="M3 6h14M3 14h14" stroke="currentColor" stroke-width="1.5" />
+      </svg>
+    </button>
+    <nav id="primary-navigation" aria-label="Primary navigation">
+      <a href="/" aria-current={current('/')}>
+        Home
+      </a>
+      <a href="/services/" aria-current={current('/services')}>
+        Services
+      </a>
+      <a href="/work/" aria-current={current('/work')}>
+        Our Work
+      </a>
+      <details class="nav-dropdown">
+        <summary
+          class:list={[pathname.startsWith('/products') && 'section-current']}
+        >
+          Products <span aria-hidden="true">⌄</span>
+        </summary>
+        <div class="dropdown-links">
+          <a
+            href="/products/software/"
+            aria-current={current('/products/software')}
+          >
+            Software <span aria-hidden="true">↗</span>
+          </a>
+          <a href="/products/games/" aria-current={current('/products/games')}>
+            Games <span aria-hidden="true">↗</span>
+          </a>
+        </div>
+      </details>
+      <details class="nav-dropdown">
+        <summary
+          class:list={[pathname.startsWith('/about') && 'section-current']}
+        >
+          About <span aria-hidden="true">⌄</span>
+        </summary>
+        <div class="dropdown-links">
+          <a href="/about/" aria-current={current('/about')}>
+            About Us <span aria-hidden="true">↗</span>
+          </a>
+          <a href="/about/team/" aria-current={current('/about/team')}>
+            Our Team <span aria-hidden="true">↗</span>
+          </a>
+        </div>
+      </details>
+      <a
+        class="nav-contact"
+        href="/contact/"
+        aria-current={current('/contact')}
+      >
+        Contact <span aria-hidden="true">↗</span>
+      </a>
+    </nav>
+  </div>
+</header>
+<script>
+  const header = document.querySelector<HTMLElement>('.site-header');
+  const toggle = header?.querySelector<HTMLButtonElement>('.menu-toggle');
+  const navigation = header?.querySelector<HTMLElement>('nav');
+  const dropdowns = Array.from(
+    header?.querySelectorAll<HTMLDetailsElement>('.nav-dropdown') ?? [],
+  );
+  if (header && toggle && navigation) {
+    header.classList.add('enhanced');
+    const closeDropdowns = () =>
+      dropdowns.forEach((dropdown) => {
+        dropdown.open = false;
+      });
+    const closeMenu = () => {
+      toggle.setAttribute('aria-expanded', 'false');
+      header.classList.remove('menu-open');
+      closeDropdowns();
+    };
+    toggle.addEventListener('click', () => {
+      const opening = toggle.getAttribute('aria-expanded') !== 'true';
+      toggle.setAttribute('aria-expanded', String(opening));
+      header.classList.toggle('menu-open', opening);
+      if (!opening) closeDropdowns();
+    });
+    dropdowns.forEach((dropdown) => {
+      dropdown.addEventListener('toggle', () => {
+        if (dropdown.open)
+          dropdowns
+            .filter((other) => other !== dropdown)
+            .forEach((other) => {
+              other.open = false;
+            });
+      });
+      dropdown.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && dropdown.open) {
+          event.preventDefault();
+          event.stopPropagation();
+          dropdown.open = false;
+          dropdown.querySelector('summary')?.focus();
+        }
+      });
+      dropdown.addEventListener('focusout', () => {
+        window.setTimeout(() => {
+          if (!dropdown.contains(document.activeElement)) dropdown.open = false;
+        }, 0);
+      });
+    });
+    document.addEventListener('click', (event) => {
+      if (event.target instanceof Node) {
+        dropdowns.forEach((dropdown) => {
+          if (!dropdown.contains(event.target as Node)) dropdown.open = false;
+        });
+        if (!header.contains(event.target)) closeMenu();
+      }
+    });
+    header.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape') {
+        closeMenu();
+        toggle.focus();
+      }
+    });
+    navigation.addEventListener('click', (event) => {
+      if (event.target instanceof Element && event.target.closest('a'))
+        closeMenu();
+    });
+    window
+      .matchMedia('(min-width: 981px)')
+      .addEventListener('change', (event) => {
+        const restoreFocus =
+          !event.matches && navigation.contains(document.activeElement);
+        closeMenu();
+        if (restoreFocus) toggle.focus();
+      });
+  }
+</script>
+<style>
+  .site-header {
+    position: relative;
+    z-index: 20;
+    background: var(--ink);
+    color: var(--white);
+    border-bottom: 1px solid #343438;
+  }
+  .header-inner {
+    min-height: 94px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 13px;
+    text-decoration: none;
+    flex-shrink: 0;
+  }
+  .brand-mark {
+    width: 42px;
+    height: 42px;
+    display: grid;
+    place-content: center;
+    background: var(--crimson);
+    font-size: 30px;
+    font-weight: 750;
+    letter-spacing: -0.12em;
+    padding-right: 3px;
+    line-height: 1;
+  }
+  .brand-mark span {
+    color: #fff;
+  }
+  .brand-wordmark {
+    font-size: 14px;
+    font-weight: 750;
+    letter-spacing: 0.045em;
+    white-space: nowrap;
+  }
+  .brand-wordmark > span {
+    font-weight: 400;
+    color: #c4c4c7;
+  }
+  nav {
+    display: flex;
+    align-items: center;
+    gap: 26px;
+  }
+  nav > a,
+  summary {
+    color: #d9d9dc;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  nav > a:hover,
+  summary:hover,
+  nav a[aria-current],
+  .section-current {
+    color: white;
+  }
+  nav > a[aria-current]:not(.nav-contact) {
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 9px;
+  }
+  .nav-contact {
+    border: 1px solid #a82940;
+    padding: 0 18px;
+    margin-left: 2px;
+  }
+  .nav-contact:hover {
+    background: var(--crimson);
+  }
+  .nav-contact span {
+    margin-left: 8px;
+  }
+  .nav-dropdown {
+    position: relative;
+  }
+  summary {
+    cursor: pointer;
+    list-style: none;
+  }
+  summary::-webkit-details-marker {
+    display: none;
+  }
+  summary > span {
+    font-size: 17px;
+    line-height: 1;
+    transition: transform 0.18s;
+  }
+  .nav-dropdown[open] summary > span {
+    transform: rotate(180deg);
+  }
+  .dropdown-links {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: -18px;
+    width: 194px;
+    background: #1b1b20;
+    border: 1px solid #424249;
+    padding: 8px;
+    box-shadow: 0 15px 24px #0003;
+  }
+  .dropdown-links a {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 12px 10px;
+    font-size: 14px;
+    text-decoration: none;
+    color: #e4e4e8;
+  }
+  .dropdown-links a:hover,
+  .dropdown-links a[aria-current] {
+    background: #303036;
+    color: white;
+  }
+  .dropdown-links a[aria-current] {
+    border-left: 2px solid var(--accent);
+  }
+  .menu-toggle {
+    display: none;
+    align-items: center;
+    gap: 13px;
+    background: transparent;
+    border: 1px solid #69696f;
+    color: white;
+    font: inherit;
+    font-size: 13px;
+    padding: 10px 12px;
+    min-height: 44px;
+  }
+  @media (max-width: 980px) {
+    .header-inner {
+      min-height: 80px;
+      flex-wrap: wrap;
+      gap: 0;
+      padding-block: 18px;
+    }
+    .brand-wordmark {
+      font-size: 12px;
+    }
+    .brand-mark {
+      width: 36px;
+      height: 36px;
+      font-size: 27px;
+    }
+    .brand {
+      gap: 10px;
+    }
+    nav {
+      width: 100%;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0;
+      padding-top: 18px;
+    }
+    nav > a,
+    summary {
+      padding: 12px 0;
+      font-size: 15px;
+      min-height: 48px;
+    }
+    .nav-dropdown {
+      border-top: 1px solid #343438;
+    }
+    .dropdown-links {
+      position: static;
+      width: auto;
+      box-shadow: none;
+      margin-bottom: 12px;
+      border: 0;
+      border-left: 1px solid #5e5e66;
+      padding: 0 0 0 16px;
+      background: transparent;
+    }
+    .dropdown-links a {
+      padding: 12px;
+      min-height: 44px;
+    }
+    .nav-contact {
+      margin: 12px 0 0;
+      padding: 12px 16px;
+      justify-content: space-between;
+    }
+    .enhanced .menu-toggle {
+      display: flex;
+      margin-left: auto;
+    }
+    .enhanced nav {
+      display: none;
+    }
+    .enhanced.menu-open nav {
+      display: flex;
+    }
+  }
+  @media (max-width: 380px) {
+    .brand-wordmark {
+      font-size: 10px;
+      letter-spacing: 0.025em;
+    }
+    .brand {
+      gap: 8px;
+    }
+    .menu-toggle {
+      padding: 10px;
+      gap: 8px;
+    }
+  }
+</style>

@@ -1,4 +1,58 @@
 ---
 import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
 ---
-<Base title="Products | Prather Software"><section class="pagehero"><div class="wrap"><div class="eyebrow">PRODUCTS</div><h1>Independent ideas. Useful software.</h1><p>Explore original consumer applications and games developed and published by Prather Software.</p></div></section><section class="section"><div class="wrap"><div class="grid"><a class="card" href="/products/software"><div class="eyebrow">SOFTWARE</div><h3>Consumer Applications ↗</h3><p>Tools, utilities, and future SaaS products.</p></a><a class="card" href="/products/games"><div class="eyebrow">GAMES</div><h3>NinjaDawg Studios ↗</h3><p>Original games under our internal label.</p></a></div></div></section></Base>
+
+<Base
+  title="Independent Software & Games | Prather Software"
+  description="Explore Prather Software’s independent publishing: useful software applications and original games under NinjaDawg Studios. Verified release details will be published here."
+>
+  <PageHero
+    eyebrow="Products / Independent publishing"
+    title="Independent ideas. Carefully engineered."
+    description="Alongside client engineering, Prather Software develops original software and games. Explore the two sides of our publishing work."
+  />
+  <section class="section">
+    <div class="wrap">
+      <div class="grid">
+        <a class="card" href="/products/software/">
+          <p class="eyebrow">Software</p>
+          <h2>
+            Useful applications. <span aria-hidden="true">↗</span>
+          </h2>
+          <p>
+            Consumer applications and utilities designed around everyday
+            problems.
+          </p>
+          <span class="text-link">Explore software</span>
+        </a>
+        <a class="card" href="/products/games/">
+          <p class="eyebrow">NinjaDawg Studios</p>
+          <h2>
+            Original games. <span aria-hidden="true">↗</span>
+          </h2>
+          <p>
+            Independent game development and publishing under the Prather
+            Software umbrella.
+          </p>
+          <span class="text-link">Explore games</span>
+        </a>
+      </div>
+      <p class="muted catalog-note">
+        There are no verified public releases listed yet. Product names,
+        platforms, pricing, and store links will appear when they are ready to
+        share.
+      </p>
+    </div>
+  </section>
+</Base>
+<style>
+  .card h2 {
+    font-size: clamp(1.6rem, 3vw, 2.4rem);
+    margin-block: 1rem;
+  }
+  .catalog-note {
+    max-width: 800px;
+    margin-top: 2rem;
+  }
+</style>

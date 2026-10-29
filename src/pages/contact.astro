@@ -1,4 +1,283 @@
 ---
 import Base from '../layouts/Base.astro';
+import { inquiryCategories } from '../lib/contact';
+const siteKey = import.meta.env.PUBLIC_TURNSTILE_SITE_KEY?.trim();
+const enabled =
+  import.meta.env.PUBLIC_CONTACT_ENABLED === 'true' && Boolean(siteKey);
 ---
-<Base title="Contact | Prather Software"><section class="pagehero"><div class="wrap"><div class="eyebrow">CONTACT</div><h1>Let's build something useful.</h1><p>Have a project, product question, or partnership idea? Start a conversation.</p></div></section><section class="section"><div class="wrap grid"><div><h2 style="font-size:2.5rem">Tell us what you need.</h2><p class="muted">We welcome software engineering inquiries, product questions, and partnership conversations.</p><p class="muted">The secure submission endpoint is being configured. The form will be enabled only after spam protection, server validation, and delivery are verified.</p></div><form class="card" onsubmit="return false"><div class="field"><label for="name">Your name</label><input id="name" name="name" required disabled/></div><div class="field"><label for="email">Email address</label><input id="email" type="email" name="email" required disabled/></div><div class="field"><label for="category">Inquiry type</label><select id="category" name="category" disabled><option>Project consultation</option><option>Product support</option><option>Partnership</option><option>General</option></select></div><div class="field"><label for="message">Project details</label><textarea id="message" name="message" disabled></textarea></div><button class="button" type="submit" disabled aria-describedby="form-note">Submissions coming soon</button><p id="form-note" class="muted" style="font-size:.8rem">Not accepting submissions yet. No data is transmitted.</p></form></div></section></Base>
+
+<Base
+  title="Contact | Prather Software"
+  description="Discuss a custom software project, product question, or collaboration with Prather Software LLC."
+>
+  <section class="pagehero">
+    <div class="wrap">
+      <div class="eyebrow">CONTACT / START A CONVERSATION</div>
+      <h1>
+        Let's build
+        <br />
+        something useful.
+      </h1>
+      <p>
+        Tell us where you want to go. We’ll help you find a practical technical
+        approach.
+      </p>
+    </div>
+  </section>
+  <section class="section">
+    <div class="wrap contact-grid">
+      <div class="contact-intro">
+        <div class="eyebrow">YOUR NEXT CHAPTER</div>
+        <h2>Good software starts with a clear problem.</h2>
+        <p class="muted">
+          A new application, a system that needs to work better, or an idea
+          worth exploring. Share the context, what success looks like, and any
+          constraints.
+        </p>
+        <dl class="inquiry-guide">
+          <div>
+            <dt>Client software solutions</dt>
+            <dd>
+              Applications, infrastructure, automation, and specialized
+              engineering.
+            </dd>
+          </div>
+          <div>
+            <dt>Independent products</dt>
+            <dd>Software and NinjaDawg Studios game inquiries.</dd>
+          </div>
+        </dl>
+        {!enabled && (
+          <p class="availability">
+            <strong>Online inquiries are coming soon.</strong>
+            <br />
+            Secure submissions are being configured. This form is currently
+            disabled and does not send information.
+          </p>
+        )}
+      </div>
+      <form
+        id="contact-form"
+        class="card contact-form"
+        action="/api/contact"
+        method="post"
+        data-enabled={String(enabled)}
+        data-sitekey={siteKey ?? ''}
+        aria-describedby="form-note"
+      >
+        <fieldset disabled={!enabled}>
+          <legend class="form-legend">Your inquiry</legend>
+          <div class="field">
+            <label for="name">
+              Your name <span aria-hidden="true">*</span>
+            </label>
+            <input
+              id="name"
+              name="name"
+              autocomplete="name"
+              minlength="2"
+              maxlength="100"
+              required
+              aria-describedby="name-error"
+            />
+            <span class="field-error" id="name-error"></span>
+          </div>
+          <div class="field">
+            <label for="email">
+              Email address <span aria-hidden="true">*</span>
+            </label>
+            <input
+              id="email"
+              type="email"
+              name="email"
+              autocomplete="email"
+              maxlength="254"
+              required
+              aria-describedby="email-error"
+            />
+            <span class="field-error" id="email-error"></span>
+          </div>
+          <div class="field">
+            <label for="category">
+              Inquiry type <span aria-hidden="true">*</span>
+            </label>
+            <select
+              id="category"
+              name="category"
+              required
+              aria-describedby="category-error"
+            >
+              <option value="">Select an inquiry type</option>
+              {inquiryCategories.map((item) => (
+                <option value={item.value}>{item.label}</option>
+              ))}
+            </select>
+            <span class="field-error" id="category-error"></span>
+          </div>
+          <div class="field">
+            <label for="message">
+              How can we help? <span aria-hidden="true">*</span>
+            </label>
+            <textarea
+              id="message"
+              name="message"
+              minlength="20"
+              maxlength="5000"
+              required
+              aria-describedby="message-hint message-error"
+            ></textarea>
+            <span class="field-hint" id="message-hint">
+              20–5,000 characters. Please don’t include passwords or sensitive
+              information.
+            </span>
+            <span class="field-error" id="message-error"></span>
+          </div>
+          <div class="honey" aria-hidden="true">
+            <label for="website">Leave this field empty</label>
+            <input
+              id="website"
+              name="website"
+              tabindex="-1"
+              autocomplete="off"
+            />
+          </div>
+          {enabled && (
+            <div
+              id="turnstile-widget"
+              role="group"
+              aria-label="Security verification"
+              aria-describedby="verification-error"
+            ></div>
+          )}
+          <span class="field-error" id="verification-error"></span>
+          <button class="button" id="contact-submit" type="submit" disabled>
+            {enabled ? 'Send inquiry ↗' : 'Submissions coming soon'}
+          </button>
+        </fieldset>
+        <p id="form-note" class="field-hint">
+          {enabled
+            ? 'Required fields are marked *. How we use your inquiry is described in our '
+            : 'No information is sent while this form is disabled. Read our '}
+          <a href="/privacy/">privacy notice</a>.
+        </p>
+        <p
+          id="contact-status"
+          class="form-status"
+          role="status"
+          aria-live="polite"
+          tabindex="-1"
+        ></p>
+        {enabled && (
+          <p id="contact-js-note" class="availability">
+            JavaScript is required for security verification and online
+            inquiries.
+          </p>
+        )}
+      </form>
+    </div>
+  </section>
+  <script>
+    import '../scripts/contact';
+  </script>
+</Base>
+<style>
+  .contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.1fr;
+    gap: clamp(2rem, 6vw, 6rem);
+    align-items: start;
+  }
+  .contact-intro h2 {
+    font-size: clamp(2rem, 3.7vw, 3rem);
+  }
+  .inquiry-guide {
+    margin: 2rem 0;
+  }
+  .inquiry-guide div {
+    border-top: 1px solid #d8d8dc;
+    padding: 1.2rem 0;
+  }
+  .inquiry-guide dt {
+    font-weight: 700;
+    margin-bottom: 0.35rem;
+  }
+  .inquiry-guide dd {
+    margin: 0;
+    color: #62636b;
+    line-height: 1.7;
+  }
+  .availability {
+    padding: 1.2rem;
+    background: #f3eeef;
+    border-left: 3px solid #a91d36;
+    line-height: 1.8;
+    font-size: 0.9rem;
+  }
+  .contact-form fieldset {
+    border: 0;
+    padding: 0;
+    margin: 0;
+    min-width: 0;
+  }
+  .form-legend {
+    font-weight: 700;
+    font-size: 1.4rem;
+    margin-bottom: 1.5rem;
+  }
+  .field-error {
+    color: #9d1831;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    display: block;
+  }
+  .field-error:empty {
+    display: none;
+  }
+  .field-hint {
+    font-size: 0.82rem;
+    color: #62636b;
+    line-height: 1.7;
+  }
+  .field-hint a {
+    text-decoration: underline;
+  }
+  .form-status:empty {
+    display: none;
+  }
+  .form-status {
+    border-left: 3px solid #a91d36;
+    padding: 0.8rem 1rem;
+    background: #f3eeef;
+    line-height: 1.7;
+  }
+  .honey {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .contact-form [aria-invalid='true'] {
+    border-color: #9d1831;
+  }
+  .contact-form input:disabled,
+  .contact-form textarea:disabled,
+  .contact-form select:disabled {
+    color: #5e6067;
+    background: #f1f1f0;
+    opacity: 1;
+  }
+  .contact-form button {
+    margin-top: 1rem;
+  }
+  .contact-form textarea {
+    resize: vertical;
+    min-height: 160px;
+  }
+  @media (max-width: 800px) {
+    .contact-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

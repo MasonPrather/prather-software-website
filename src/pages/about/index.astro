@@ -1,4 +1,75 @@
 ---
 import Base from '../../layouts/Base.astro';
+import PageHero from '../../components/PageHero.astro';
+import ContactCTA from '../../components/ContactCTA.astro';
 ---
-<Base title="About Us | Prather Software"><section class="pagehero"><div class="wrap"><div class="eyebrow">ABOUT US</div><h1>Software built with purpose.</h1><p>Prather Software is a founder-led engineering and publishing company focused on practical solutions, maintainable systems, and independent innovation.</p></div></section><section class="section"><div class="wrap"><div class="grid"><article class="card"><h3>Our mission</h3><p>Design, build, and deliver reliable software for businesses and consumers, from complete digital systems to original applications and games.</p></article><article class="card"><h3>Our approach</h3><p>Understand the real problem, design for maintainability, engineer with care, and iterate on measurable outcomes.</p></article></div></div></section></Base>
+
+<Base
+  title="About Prather Software LLC"
+  description="Prather Software LLC is a founder-led software engineering and independent publishing company building practical business software, original applications, and games."
+>
+  <PageHero
+    eyebrow="About Us"
+    title="Software built with purpose."
+    description="Prather Software LLC is a founder-led engineering and publishing company. We bring practical software thinking to business challenges and make space for original products of our own."
+  />
+  <section class="section">
+    <div class="wrap">
+      <div class="grid">
+        <article class="card">
+          <p class="eyebrow">Client software solutions</p>
+          <h2>Build around the problem.</h2>
+          <p>
+            Custom applications, backend systems, automation, and specialized
+            engineering shaped around a clear need. The goal is useful software
+            that can be understood, maintained, and improved.
+          </p>
+          <a class="text-link" href="/services/">
+            Explore engineering services <span aria-hidden="true">↗</span>
+          </a>
+        </article>
+        <article class="card">
+          <p class="eyebrow">Independent publishing</p>
+          <h2>Make room for original ideas.</h2>
+          <p>
+            Our publishing work covers consumer software and games, including
+            projects under the NinjaDawg Studios label. Public product
+            information will be shared as it becomes ready.
+          </p>
+          <a class="text-link" href="/products/">
+            Explore our products <span aria-hidden="true">↗</span>
+          </a>
+        </article>
+      </div>
+    </div>
+  </section>
+  <section class="section alt">
+    <div class="wrap principles">
+      <p class="eyebrow">How we work</p>
+      <h2>Clarity is part of the craft.</h2>
+      <p class="muted">
+        Understand the actual problem. Make tradeoffs explicit. Build a
+        maintainable solution. Validate the behavior that matters, and document
+        what comes next.
+      </p>
+      <p class="muted">
+        Our work page separates academic research, prior professional
+        experience, independent projects, and company client engagements so you
+        can assess each on its own terms.
+      </p>
+      <a class="text-link" href="/about/team/">
+        Meet the founder <span aria-hidden="true">↗</span>
+      </a>
+    </div>
+  </section>
+  <ContactCTA />
+</Base>
+<style>
+  .card h2 {
+    font-size: clamp(1.6rem, 3vw, 2.4rem);
+    margin-block: 1rem;
+  }
+  .principles {
+    max-width: 900px;
+  }
+</style>

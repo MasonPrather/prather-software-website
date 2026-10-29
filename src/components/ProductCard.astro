@@ -1,0 +1,19 @@
+---
+import type { CollectionEntry } from 'astro:content';
+interface Props {
+  entry: CollectionEntry<'software'> | CollectionEntry<'games'>;
+  category: 'software' | 'games';
+}
+const { entry, category } = Astro.props;
+---
+
+<a class="card" href={`/products/${category}/${entry.id}/`}>
+  <p class="eyebrow">{entry.data.status}</p>
+  <h3>
+    {entry.data.title} <span aria-hidden="true">↗</span>
+  </h3>
+  <p>{entry.data.summary}</p>
+  <p>
+    <strong>Platforms:</strong> {entry.data.platforms.join(', ')}
+  </p>
+</a>

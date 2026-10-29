@@ -1,5 +1,77 @@
 ---
 import '../styles/global.css';
-const {title='Prather Software | Engineering & Digital Products',description='Custom software engineering and original digital products.'}=Astro.props;
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+interface Props {
+  title?: string;
+  description?: string;
+  noindex?: boolean;
+}
+const {
+  title = 'Prather Software | Engineering & Independent Publishing',
+  description = 'Founder-led custom software engineering, web applications, backend systems, automation, and original software and games from Prather Software LLC.',
+  noindex = false,
+} = Astro.props;
+const canonical = new URL(
+  Astro.url.pathname,
+  Astro.site ?? 'https://prathersoftware.com',
+);
+const socialImage = new URL(
+  '/social-card.png',
+  Astro.site ?? 'https://prathersoftware.com',
+);
+const organization = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'Prather Software LLC',
+  url: Astro.site?.toString() ?? 'https://prathersoftware.com',
+  description:
+    'Custom software engineering and independent software and game publishing.',
+};
 ---
-<!doctype html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><meta name="description" content={description}/><link rel="canonical" href={new URL(Astro.url.pathname,Astro.site)}/><title>{title}</title></head><body><a class="skip" href="#main">Skip to content</a><header><div class="wrap nav"><a class="brand" href="/"><span class="mark">P.</span> PRATHER <span style="font-weight:400;color:#bbb">SOFTWARE</span></a><button id="toggle" aria-controls="links" aria-expanded="false">Menu ☰</button><nav id="links" aria-label="Primary navigation"><a href="/">Home</a><a href="/services">Services</a><a href="/work">Our Work</a><div class="drop"><a href="/products">Products</a><div class="sub"><a href="/products/software">Software</a><a href="/products/games">Games</a></div></div><div class="drop"><a href="/about">About</a><div class="sub"><a href="/about">About Us</a><a href="/about/team">Our Team</a></div></div><a class="contact" href="/contact">Let's Talk ↗</a></nav></div></header><main id="main"><slot/></main><footer class="footer"><div class="wrap"><div class="eyebrow">PRATHER SOFTWARE</div><h2 style="font-size:2rem">Technology built with purpose.</h2><p>Custom engineering solutions and original digital products.</p><hr style="border:0;border-top:1px solid #444;margin:45px 0 20px"/><p style="font-size:.8rem;color:#aaa">© {new Date().getFullYear()} Prather Software LLC · <a href="/privacy">Privacy</a> · <a href="/contact">Contact</a></p></div></footer><script>const b=document.querySelector<HTMLButtonElement>('#toggle');const n=document.querySelector('#links');b?.addEventListener('click',()=>{const v=b.getAttribute('aria-expanded')!=='true';b.setAttribute('aria-expanded',String(v));n?.classList.toggle('open',v)});</script></body></html><style>header{background:#111216;color:white;position:relative;z-index:10}.nav{min-height:82px;display:flex;align-items:center;justify-content:space-between}.brand{display:flex;align-items:center;gap:9px;font:700 .95rem 'Space Grotesk'}.mark{display:grid;place-items:center;width:42px;height:42px;background:#b51e38;font-size:1.7rem;margin-right:8px}nav{display:flex;align-items:center;gap:28px}nav a{font-size:.84rem;font-weight:700;color:#d2d2d8}.drop{position:relative;padding:20px 0}.sub{display:none;position:absolute;top:100%;left:-15px;min-width:145px;background:#22232a;border:1px solid #444}.sub a{display:block;padding:12px 15px}.drop:hover .sub,.drop:focus-within .sub{display:block}.contact{border:1px solid #b51e38;padding:12px 16px}#toggle{display:none;background:transparent;color:white;border:1px solid #666;padding:10px}@media(max-width:850px){.nav{min-height:72px}#toggle{display:block}nav{display:none;position:absolute;top:72px;left:0;right:0;background:#17181e;flex-direction:column;align-items:stretch;padding:18px 24px;gap:0}nav.open{display:flex}nav>a,.drop>a{display:block;padding:12px 0}.drop{padding:0}.sub{display:block;position:static;background:transparent;border:0;padding-left:20px}.sub a{padding:9px 0}}</style>
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#131316" />
+    {noindex && <meta name="robots" content="noindex, follow" />}
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="sitemap" href="/sitemap.xml" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:site_name" content="Prather Software" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={socialImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="Prather Software — custom engineering and independent publishing"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={socialImage} />
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify(organization)}
+    />
+    <title>{title}</title>
+  </head>
+  <body>
+    <a class="skip" href="#main">
+      Skip to content
+    </a>
+    <Header />
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>
