@@ -55,6 +55,6 @@ The contact implementation validates and limits requests server-side, checks sam
 
 The UI, server enable flag, and delivery-verification flag default off. Configure real Turnstile keys/allowed hosts, a verified sender and recipient, and private environment secrets; verify a real accepted message and token replay rejection in staging before activating the form. Resend is an unconfigured implementation choice; no account, paid plan, or remote resource has been created.
 
-No production DNS, custom domain, or deployment is configured by this change. Review [the staging guide](docs/cloudflare-staging.md) and obtain approval before production deployment or DNS changes. Contact/privacy text and retention practices must match the selected live configuration before activation.
+The verified Cloudflare account is pinned in Wrangler configuration. Cloudflare app authentication and Wrangler CLI authentication are separate. The existing `privacy.prathersoftware.com` Worker is outside this deployment and must be preserved. No production DNS, custom domain, or deployment is configured by this change. Review [the staging guide](docs/cloudflare-staging.md) and obtain approval before production deployment or DNS changes. Contact/privacy text and retention practices must match the selected live configuration before activation.
 
 See [the verification record](docs/milestone-2-verification.md) for tested scope and remaining production checks.

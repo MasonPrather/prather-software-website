@@ -1,6 +1,7 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
   "name": "prather-software-staging",
+  "account_id": "901d7b0a79a15aaa0f84fbca1bbb2ad5",
   "main": "worker/index.ts",
   "compatibility_date": "2026-10-29",
   "workers_dev": false,

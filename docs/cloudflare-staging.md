@@ -2,6 +2,14 @@
 
 Astro renders to `dist/`; the standalone Worker serves files through `ASSETS` and handles `/api/contact`. No SSR adapter, database, or R2 storage is needed. Configuration targets **prather-software-staging**, with no routes, custom domains, workers.dev, or version preview URLs. Nothing has been deployed. Every response carries `X-Robots-Tag: noindex, nofollow` for staging. Production requires a separately reviewed configuration and removal of that staging restriction.
 
+## Verified account and existing routing
+
+`wrangler.jsonc` pins account `901d7b0a79a15aaa0f84fbca1bbb2ad5`. Cloudflare app authentication and read access to this account and the active `prathersoftware.com` zone have been verified. The app and local Wrangler use separate authentication sessions; the standard deployment path requires `npx wrangler whoami` to succeed for this account. Wrangler OAuth can store its session in macOS Keychain with `--use-keyring`; never copy app tokens into source or terminal arguments.
+
+The existing `prather-software-privacy` Worker serves `privacy.prathersoftware.com`. It has no workers.dev or version-preview URL enabled. Do not overwrite that Worker, its custom domain, or production routing when deploying this repository. The distinct staging target is `prather-software-staging`.
+
+No account-level workers.dev subdomain was registered at the preflight check, and no staging Worker existed. An approved workers.dev subdomain or custom staging hostname is still needed before making staging public. Registering a workers.dev subdomain is an account configuration change; this preflight did not create one.
+
 ## Local verification
 
 Install dependencies and build, then use `npm run worker:dev -- --ip 127.0.0.1 --port 8787`. Generate bindings with `npm run worker:types`; type-check with `npm run check`; package with `npm run worker:dry-run`. Run `npx playwright install chromium firefox webkit` and `npm run verify` for the complete local gate, including browser compatibility and accessibility checks. Playwright WebKit is not a substitute for actual Safari, VoiceOver, or device testing. These commands do not deploy or change DNS. A dry run does not prove remote bindings or email delivery.
