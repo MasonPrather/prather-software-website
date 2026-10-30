@@ -13,7 +13,25 @@ const { entry, category } = Astro.props;
     {entry.data.title} <span aria-hidden="true">↗</span>
   </h3>
   <p>{entry.data.summary}</p>
+  {entry.data.releaseWindow && (
+    <p class="release-window">
+      <strong>Planned release:</strong> {entry.data.releaseWindow}
+    </p>
+  )}
+  {entry.data.productType && (
+    <p class="product-type">{entry.data.productType}</p>
+  )}
   <p>
     <strong>Platforms:</strong> {entry.data.platforms.join(', ')}
   </p>
 </a>
+
+<style>
+  .release-window {
+    font-size: 0.85rem;
+  }
+  .product-type {
+    font-size: 0.8rem;
+    font-weight: 600;
+  }
+</style>

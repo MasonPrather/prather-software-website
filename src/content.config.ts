@@ -25,6 +25,12 @@ const productSchema = z
     title: text,
     summary: text.max(240),
     status: z.enum(['In development', 'Coming soon', 'Released']),
+    productType: text.max(80).optional(),
+    releaseWindow: text.max(120).optional(),
+    plannedSupport: z.array(text).default([]),
+    roadmapNote: text.max(300).optional(),
+    publishingLabel: text.optional(),
+    featured: z.boolean().default(false),
     platforms: z.array(text).min(1),
     price: text.optional(),
     storeUrl: z

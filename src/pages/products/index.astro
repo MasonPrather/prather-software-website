@@ -5,7 +5,7 @@ import PageHero from '../../components/PageHero.astro';
 
 <Base
   title="Independent Software & Games | Prather Software"
-  description="Explore Prather Software’s independent publishing: useful software applications and original games under NinjaDawg Studios. Verified release details will be published here."
+  description="Explore Prather Software’s independent publishing: useful software applications and original games under NinjaDawg Studios. Discover Quest Theater, Promenade, Rick Dangerman Remastered, and Floor 13."
 >
   <PageHero
     eyebrow="Products / Independent publishing"
@@ -39,10 +39,20 @@ import PageHero from '../../components/PageHero.astro';
         </a>
       </div>
       <p class="muted catalog-note">
-        There are no verified public releases listed yet. Product names,
-        platforms, pricing, and store links will appear when they are ready to
-        share.
+        Explore current product overviews and platform plans. Availability,
+        pricing, and official store links are listed only when confirmed.
       </p>
+      <aside class="business-note">
+        <h2>Software for your business.</h2>
+        <p>
+          Website design, custom PC and mobile applications, SaaS, server
+          support, AI integration, and ongoing technical service for contracted
+          implementations.
+        </p>
+        <a class="text-link" href="/services/">
+          Explore software services <span aria-hidden="true">↗</span>
+        </a>
+      </aside>
     </div>
   </section>
 </Base>
@@ -50,6 +60,14 @@ import PageHero from '../../components/PageHero.astro';
   .card h2 {
     font-size: clamp(1.6rem, 3vw, 2.4rem);
     margin-block: 1rem;
+  }
+  .business-note {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--line);
+  }
+  .business-note h2 {
+    font-size: 2rem;
   }
   .catalog-note {
     max-width: 800px;

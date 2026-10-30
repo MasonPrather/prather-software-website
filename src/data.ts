@@ -1,11 +1,11 @@
 export const services = [
   [
     'Web & Applications',
-    'Websites, mobile and desktop applications, internal tools, and dashboards.',
+    'Website design, custom PC and mobile applications, SaaS, internal tools, and dashboards.',
   ],
   [
     'Backend & Infrastructure',
-    'APIs, cloud infrastructure, integrations, and system modernization.',
+    'Server support, APIs, cloud infrastructure, integrations, and system modernization.',
   ],
   [
     'Automation & Intelligence',
@@ -22,9 +22,9 @@ export const serviceDetails = [
     description:
       'Build a useful interface around the work your customers and team need to do.',
     capabilities: [
-      'Business websites and accessible web applications',
-      'Mobile and desktop applications',
-      'Internal tools, operational dashboards, and customer portals',
+      'Website design and accessible web applications',
+      'Business-based custom applications for PC and mobile devices',
+      'SaaS applications, internal tools, and customer portals',
     ],
     approach:
       'Start with essential workflows, make them clear and accessible, and build a maintainable foundation for the next iteration.',
@@ -35,7 +35,7 @@ export const serviceDetails = [
       'Connect the systems behind your product with dependable software and clear interfaces.',
     capabilities: [
       'API design and third-party integrations',
-      'Cloud services, deployment workflows, and observability',
+      'Server support, cloud services, deployment workflows, and observability',
       'Data workflows and modernization of existing systems',
     ],
     approach:
