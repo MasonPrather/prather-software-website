@@ -11,5 +11,15 @@
     "expectedHostname": "prathersoftware.com",
     "action": "contact"
   },
-  "staging": null
+  "staging": {
+    "sitekey": "0x4AAAAAAFsCcoZSKLOD1l_B",
+    "name": "Prather Software staging contact",
+    "domains": ["staging.prathersoftware.com", "localhost", "127.0.0.1"],
+    "mode": "managed",
+    "clearanceLevel": "no_clearance",
+    "worker": "prather-software-staging",
+    "secretBinding": "TURNSTILE_SECRET",
+    "expectedHostname": "staging.prathersoftware.com",
+    "action": "contact"
+  }
 }

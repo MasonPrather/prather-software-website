@@ -5,9 +5,11 @@
   "rules": [
     {
       "action": "set_config",
-      "expression": "(http.host in {\"prathersoftware.com\" \"www.prathersoftware.com\"})",
-      "action_parameters": { "disable_rum": true },
-      "description": "Disable unintended analytics on main website",
+      "expression": "(http.host in {\"prathersoftware.com\" \"www.prathersoftware.com\" \"staging.prathersoftware.com\"})",
+      "action_parameters": {
+        "disable_rum": true
+      },
+      "description": "Disable unintended analytics on website and contact staging",
       "enabled": true
     }
   ]

@@ -8,7 +8,7 @@ The owner authorized the initial launch to `prathersoftware.com` on October 29, 
 - Active zone: `b741c0e55de6f1334e70d87196676e02` (`prathersoftware.com`).
 - Production: `wrangler.jsonc` environment `production`, Worker `prather-software-website`.
 - Exact Custom Domains: `prathersoftware.com` and `www.prathersoftware.com`. The Worker redirects www and apex HTTP to the canonical HTTPS apex with status 308, preserving path/query.
-- Default staging target: `prather-software-staging`, no public hostname configured and indexing disabled. No workers.dev or version preview URLs are enabled for either environment.
+- Default staging target: `prather-software-staging`, serving `staging.prathersoftware.com` with indexing disabled. No workers.dev or version preview URLs are enabled for either environment.
 - Preserve `prather-software-privacy` / `privacy.prathersoftware.com`, Google MX/SPF/DKIM/verification records, and unrelated resources. Preflight found no existing apex/www website records to replace.
 
 Successful production pages allow indexing; staging, API responses, and errors retain `X-Robots-Tag: noindex, nofollow`. The 404 page also has a noindex meta tag. Both environments retain CSP and other security headers.
@@ -65,3 +65,15 @@ The applied reference is [ops/cloudflare-main-site-rule.json](../ops/cloudflare-
 - [Wrangler environments](https://developers.cloudflare.com/workers/wrangler/environments/)
 - [Disable RUM with Configuration Rules](https://developers.cloudflare.com/rules/configuration-rules/settings/#disable-real-user-monitoring-rum)
 - [Workers authorization](https://developers.cloudflare.com/workers/authorization/workers/)
+
+## Services/products cleanup and contact preparation
+
+On October 29, 2026, the owner requested removal of research and personal-work entries and setup of a working inquiry form. Source `567de8f1ff98386939ad8cf28e865bb7d4da2115` is deployed to production as Worker version `6d3f97cc-ecf7-4114-b318-b6bd653450ab`. [Cleanup CI](https://github.com/MasonPrather/prather-software-website/actions/runs/40990291613) passed. The deployed content has 13 public sitemap routes and 14 HTML pages; all four retired work URLs return branded 404 and noindex. Live build-parity checks passed for all 13 pages and seven assets. The privacy page hash remains unchanged.
+
+`staging.prathersoftware.com` now serves the separate `prather-software-staging` Worker and stays nonindexable. The existing RUM-exclusion rule now also matches that exact staging hostname, while excluding the privacy subdomain. The reference JSON is updated.
+
+Separate managed Turnstile widgets are provisioned for production and staging, with no clearance cookies. Their secrets are stored only in each Worker’s `TURNSTILE_SECRET` binding. Public sitekeys and allowed domains are recorded in `ops/turnstile-widgets.json`; production server hostname checks remain restricted to the apex. Widget provisioning is not proof of a real successful backend verification: fresh-token and replay tests still need to run against the chosen mail transport.
+
+The owner selected `contact@prathersoftware.com` as the fixed destination. Cloudflare destination ID `c5fa662b91c44e089fae03d8a677409b` was verified at `2026-10-30T02:11:53.653528Z`. This verifies the inbox address, not contact-form delivery.
+
+Both server contact gates and the public form stay disabled. Cloudflare’s Email Sending dashboard requires Workers Paid on this account; no upgrade was purchased. The Email Routing wizard proposed replacing apex Google mail records and was closed without applying changes. Google MX/SPF/DKIM must remain intact. The existing Workspace mailbox can instead send through the Gmail API with a dedicated Internal OAuth client and `gmail.send` scope, or the existing Resend adapter can use a free account. Provider selection and authorization are pending. Before activation, complete real staging acceptance/inbox/replay checks and update the privacy notice to the selected provider.
