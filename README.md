@@ -23,13 +23,13 @@ Contact remains unavailable by default. Local environment examples contain confi
 ## Verification
 
 ```sh
-npx playwright install chromium
+npx playwright install chromium firefox webkit
 npm run verify
 ```
 
-`verify` runs Astro and Worker type checks, a static build, contact security unit tests, local link and sitemap checks, local Worker runtime checks, isolated product fixture builds, browser/WCAG checks at 375/768/1440 px plus a 320 px overflow check, and a Wrangler packaging dry run. `npm run test:e2e` expects an existing `dist/` build and starts Astro preview automatically. The active-form browser fixture builds to ignored `.test-dist/`; Turnstile and mail responses are mocked, and the production `dist/` remains disabled. Empty product collection warnings are expected until verified products exist. GitHub Actions runs these gates and an advisory audit on pushes and pull requests. It has no deployment job and needs no deployment credentials.
+`verify` runs Astro and Worker type checks, a static build, contact security unit tests, local link and sitemap checks, local Worker runtime checks, isolated product fixture builds, browser/WCAG checks in Chromium at 375/768/1440 px, Firefox at 1440 px, and Playwright WebKit at 375 px, plus a 320 px overflow check, and a Wrangler packaging dry run. `npm run test:e2e` expects an existing `dist/` build and starts Astro preview automatically. The active-form browser fixture builds to ignored `.test-dist/`; Turnstile and mail responses are mocked, and the production `dist/` remains disabled. GitHub Actions runs these gates and an advisory audit on pushes and pull requests. It has no deployment job and needs no deployment credentials.
 
-Automated accessibility checks do not establish complete WCAG conformance. Manual assistive technology review and real device/browser coverage remain required before production signoff.
+Automated accessibility checks do not establish complete WCAG conformance. Manual assistive technology review, actual Safari, and real device coverage remain required before production signoff.
 
 ## Structure
 
@@ -45,7 +45,7 @@ The site remains static-first. Plain CSS and small browser scripts keep the desi
 
 ## Content and publication
 
-The three supplied portfolio entries describe **academic research or prior professional experience**, not Prather Software clients. Review publication permissions before expanding details. No clients, testimonials, staff, product releases, pricing, or partnerships have been invented. Public product catalogs intentionally show an honest empty state until verified entries exist. Draft collection entries default to unpublished; published releases require an HTTPS store link, verified pricing (including Free), and platform metadata. Test products exist only in an automatically cleaned temporary directory.
+The three supplied portfolio entries describe **academic research or prior professional experience**, not Prather Software clients. Review publication permissions before expanding details. No clients, testimonials, staff, product releases, pricing, or partnerships have been invented. The owner-confirmed catalog lists Quest Theater under Software and Promenade, Rick Dangerman (& the Cuboids) Remastered, and Floor 13 under Games. All four products are unreleased. Quest Theater is marked Coming soon with a planned release week of November 2–8, 2026; the other three are In development. Prices and official store links remain unannounced on the site. Planned support is separate from current platforms, and Rick Dangerman’s controller/console plans remain conditional on success. Draft collection entries default to unpublished; published releases require an HTTPS store link, verified pricing (including Free), and platform metadata. Test products exist only in an automatically cleaned temporary directory.
 
 The geometric lettermark and social graphic are provisional identity assets, not a claim of finalized branding. Founder information and the NinjaDawg label relationship come from the supplied source.
 

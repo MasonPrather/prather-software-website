@@ -60,6 +60,15 @@ Temporary release content to exercise the detail template.
     await mkdir(dir, { recursive: true });
     await writeFile(path.join(dir, 'qa-release.md'), released(kind));
     await writeFile(path.join(dir, 'qa-draft.md'), released(kind, false));
+    await writeFile(
+      path.join(dir, 'qa-implicit-draft.md'),
+      released(kind).replace('published: true\n', ''),
+    );
+    const pending = released(kind)
+      .replace('status: "Released"', 'status: "Coming soon"')
+      .replace('price: "Free"\n', '')
+      .replace(`storeUrl: "https://example.com/qa-${kind}"\n`, '');
+    await writeFile(path.join(dir, 'qa-pending.md'), pending);
   }
   let result = build();
   assert.equal(result.status, 0, result.stdout + result.stderr);
@@ -81,6 +90,24 @@ Temporary release content to exercise the detail template.
     assert.ok(catalog.includes(`/products/${kind}/qa-release/`));
     assert.ok(sitemap.includes(`/products/${kind}/qa-release/`));
     assert.ok(!sitemap.includes('qa-draft'));
+    assert.ok(!sitemap.includes('qa-implicit-draft'));
+    assert.ok(sitemap.includes(`/products/${kind}/qa-pending/`));
+    const pendingDetail = await readFile(
+      path.join(fixture, 'dist/products', kind, 'qa-pending/index.html'),
+      'utf8',
+    );
+    assert.ok(pendingDetail.includes('Coming soon'));
+    assert.ok(!pendingDetail.includes('Visit official product listing'));
+    await assert.rejects(
+      access(
+        path.join(
+          fixture,
+          'dist/products',
+          kind,
+          'qa-implicit-draft/index.html',
+        ),
+      ),
+    );
     await assert.rejects(
       access(path.join(fixture, 'dist/products', kind, 'qa-draft/index.html')),
     );
@@ -99,8 +126,20 @@ Temporary release content to exercise the detail template.
     0,
     'A published Released product without a store URL must fail validation',
   );
+  assert.match(result.stdout + result.stderr, /verified HTTPS store URL/);
+  await writeFile(
+    path.join(fixture, 'src/content/software/qa-release.md'),
+    released('software').replace('price: "Free"\n', ''),
+  );
+  result = build();
+  assert.notEqual(
+    result.status,
+    0,
+    'Released products without verified pricing must fail',
+  );
+  assert.match(result.stdout + result.stderr, /verified pricing/);
   console.log(
-    'Verified software/game detail routes, catalog and sitemap publication gates, and invalid release rejection in isolated fixtures.',
+    'Verified product detail routes, unreleased availability, explicit/default draft exclusion, sitemap publication, and release URL/pricing requirements.',
   );
 } finally {
   await rm(fixture, { recursive: true, force: true });

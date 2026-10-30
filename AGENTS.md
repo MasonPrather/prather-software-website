@@ -6,7 +6,7 @@
 - `npm run dev` runs Astro; `npm run build` outputs static assets in `dist/`.
 - `npm run worker:dev` runs the standalone Worker and static assets locally after a build. Astro dev/preview alone does not provide `/api/contact`.
 - `npm run check` validates Astro/TypeScript and the separate Worker TypeScript project.
-- Before completing a change, run the relevant checks. Before a PR, run `npm run verify` and `npm audit --audit-level=high`. Install the test browser with `npx playwright install chromium` first.
+- Before completing a change, run the relevant checks. Before a PR, run `npm run verify` and `npm audit --audit-level=high`. Install the test browser with `npx playwright install chromium firefox webkit` first.
 - Keep Astro static-first. The Worker serves `ASSETS` and a contact endpoint; avoid adding a server adapter, UI framework, database, R2 storage, or client-side library without a demonstrated need.
 - Generate Worker environment declarations using `npm run worker:types` after changing bindings. Do not hand-edit generated declarations.
 
@@ -15,6 +15,7 @@
 - Never describe an academic institution, employer, or collaborator as a paying Prather Software client without explicit evidence.
 - Never publish unverified products, prices, testimonials, screenshots, partnerships, or team members.
 - Keep work attribution explicit: academic research, prior professional experience, independent project, or verified Prather Software client engagement.
+- Release windows are plans and must never automatically change a product to Released. Keep planned support separate from current platforms, and preserve conditional roadmap language. Individual publishing-label credits require evidence.
 - Product collection drafts default to unpublished. Only verified entries may set `published: true`; published releases require a verified store URL.
 - Keep test fixtures out of source content and production output. The content regression script uses a disposable directory.
 

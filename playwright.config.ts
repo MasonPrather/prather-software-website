@@ -21,6 +21,14 @@ export default defineConfig({
       name: 'desktop',
       use: { browserName: 'chromium', viewport: { width: 1440, height: 1000 } },
     },
+    {
+      name: 'firefox',
+      use: { browserName: 'firefox', viewport: { width: 1440, height: 1000 } },
+    },
+    {
+      name: 'webkit',
+      use: { browserName: 'webkit', viewport: { width: 375, height: 812 } },
+    },
   ],
   webServer: [
     {

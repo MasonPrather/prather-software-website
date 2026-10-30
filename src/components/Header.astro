@@ -125,10 +125,16 @@ const current = (href: string) =>
           dropdown.querySelector('summary')?.focus();
         }
       });
-      dropdown.addEventListener('focusout', () => {
-        window.setTimeout(() => {
-          if (!dropdown.contains(document.activeElement)) dropdown.open = false;
-        }, 0);
+      dropdown.addEventListener('focusout', (event) => {
+        // WebKit pointer clicks may clear focus before the link activates.
+        // Close for an explicit new focus target; outside clicks also dismiss.
+        const nextFocus = event.relatedTarget;
+        if (
+          nextFocus instanceof Node &&
+          nextFocus !== document.body &&
+          !dropdown.contains(nextFocus)
+        )
+          dropdown.open = false;
       });
     });
     document.addEventListener('click', (event) => {
@@ -146,8 +152,10 @@ const current = (href: string) =>
       }
     });
     navigation.addEventListener('click', (event) => {
-      if (event.target instanceof Element && event.target.closest('a'))
-        closeMenu();
+      if (event.target instanceof Element && event.target.closest('a')) {
+        // Let the link activate before collapsing its ancestor.
+        window.setTimeout(closeMenu, 0);
+      }
     });
     window
       .matchMedia('(min-width: 981px)')

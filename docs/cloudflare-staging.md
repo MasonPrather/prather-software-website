@@ -4,7 +4,7 @@ Astro renders to `dist/`; the standalone Worker serves files through `ASSETS` an
 
 ## Local verification
 
-Install dependencies and build, then use `npm run worker:dev -- --ip 127.0.0.1 --port 8787`. Generate bindings with `npm run worker:types`; type-check with `npm run check`; package with `npm run worker:dry-run`. These commands do not deploy or change DNS. A dry run does not prove remote bindings or email delivery.
+Install dependencies and build, then use `npm run worker:dev -- --ip 127.0.0.1 --port 8787`. Generate bindings with `npm run worker:types`; type-check with `npm run check`; package with `npm run worker:dry-run`. Run `npx playwright install chromium firefox webkit` and `npm run verify` for the complete local gate, including browser compatibility and accessibility checks. Playwright WebKit is not a substitute for actual Safari, VoiceOver, or device testing. These commands do not deploy or change DNS. A dry run does not prove remote bindings or email delivery.
 
 Copy `.env.example` to ignored `.env` for build-time settings and `.dev.vars.example` to ignored `.dev.vars` for Worker-local settings. Never put secrets in `PUBLIC_` variables. Astro dev alone serves the frontend; `/api/contact` requires Wrangler. Keep the public form disabled until real security and delivery verification is complete.
 

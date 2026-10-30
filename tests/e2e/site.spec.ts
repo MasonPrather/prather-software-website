@@ -1,6 +1,11 @@
 import { expect, test } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 
+// With default macOS WebKit keyboard settings, Option-Tab includes links.
+// https://developer.apple.com/documentation/webkit/wkpreferences/tabfocuseslinks
+const tabKey = (browserName: string) =>
+  browserName === 'webkit' && process.platform === 'darwin' ? 'Alt+Tab' : 'Tab';
+
 const routes = [
   '/',
   '/services/',
@@ -8,6 +13,10 @@ const routes = [
   '/products/',
   '/products/software/',
   '/products/games/',
+  '/products/software/quest-theater/',
+  '/products/games/promenade/',
+  '/products/games/rick-dangerman-remastered/',
+  '/products/games/floor-13/',
   '/about/',
   '/about/team/',
   '/contact/',
@@ -60,9 +69,10 @@ for (const route of routes) {
 
 test('skip link receives visible keyboard focus and reaches main', async ({
   page,
+  browserName,
 }) => {
   await page.goto('/');
-  await page.keyboard.press('Tab');
+  await page.keyboard.press(tabKey(browserName));
   const skip = page.getByRole('link', { name: 'Skip to content' });
   await expect(skip).toBeFocused();
   await expect(skip).toBeInViewport();
@@ -139,6 +149,7 @@ test('reduced motion disables smooth scrolling and animation', async ({
 
 test('dropdowns support keyboard, dismissal, and navigation', async ({
   page,
+  browserName,
 }) => {
   await page.goto('/');
   const menu = page.getByRole('button', { name: 'Menu', exact: true });
@@ -153,7 +164,7 @@ test('dropdowns support keyboard, dismissal, and navigation', async ({
   await summary.focus();
   await page.keyboard.press('Enter');
   await expect(products).toHaveAttribute('open', '');
-  await page.keyboard.press('Tab');
+  await page.keyboard.press(tabKey(browserName));
   await expect(products.getByRole('link', { name: 'Software' })).toBeFocused();
   await page.keyboard.press('Escape');
   await expect(products).not.toHaveAttribute('open', '');
