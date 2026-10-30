@@ -14,12 +14,13 @@
     "test:e2e": "playwright test",
     "worker:dev": "wrangler dev --local",
     "worker:types": "wrangler types --strict-vars=false",
-    "worker:dry-run": "wrangler deploy --dry-run",
+    "worker:dry-run": "wrangler deploy --dry-run --env=\"\" && wrangler deploy --dry-run --env production",
     "verify": "npm run format:check && npm run check && npm run build && npm test && npm run test:e2e && npm run worker:dry-run",
     "test:secrets": "node scripts/check-secrets.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "test:runtime": "node scripts/check-worker.mjs"
+    "test:runtime": "node scripts/check-worker.mjs && node scripts/check-worker.mjs --production",
+    "test:production": "node scripts/check-production.mjs"
   },
   "dependencies": {
     "astro": "^7.4.4"

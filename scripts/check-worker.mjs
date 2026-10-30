@@ -3,13 +3,18 @@ import { spawn } from 'node:child_process';
 import path from 'node:path';
 import { setTimeout as delay } from 'node:timers/promises';
 
+const production = process.argv.includes('--production');
 const origin = 'http://127.0.0.1:8788';
+const fetchLocal = (route = '', init = {}) =>
+  fetch(origin + route, { ...init, redirect: 'manual' });
 const server = spawn(
   process.execPath,
   [
     path.resolve('node_modules/wrangler/bin/wrangler.js'),
     'dev',
     '--local',
+    '--infer-origin-from-routes=false',
+    ...(production ? ['--env', 'production'] : []),
     '--ip',
     '127.0.0.1',
     '--port',
@@ -33,7 +38,7 @@ try {
     if (server.exitCode !== null) throw new Error(output);
     try {
       if (
-        (await fetch(origin, { signal: AbortSignal.timeout(500) })).status ===
+        (await fetchLocal('', { signal: AbortSignal.timeout(500) })).status ===
         200
       ) {
         ready = true;
@@ -50,20 +55,25 @@ try {
     '/products/software/',
     '/contact/',
   ]) {
-    const response = await fetch(origin + route);
+    const response = await fetchLocal(route);
     assert.equal(response.status, 200, route);
     assert.equal(response.headers.get('X-Content-Type-Options'), 'nosniff');
-    assert.equal(response.headers.get('X-Robots-Tag'), 'noindex, nofollow');
+    assert.equal(
+      response.headers.get('X-Robots-Tag'),
+      production ? null : 'noindex, nofollow',
+    );
     assert.ok(
       response.headers
         .get('Content-Security-Policy')
         ?.includes("frame-ancestors 'none'"),
     );
   }
-  assert.equal((await fetch(origin + '/missing-route/')).status, 404);
-  assert.equal((await fetch(origin + '/api/missing')).status, 404);
-  assert.equal((await fetch(origin + '/api/contact')).status, 405);
-  const response = await fetch(origin + '/api/contact', {
+  const missing = await fetchLocal('/missing-route/');
+  assert.equal(missing.status, 404);
+  assert.equal(missing.headers.get('X-Robots-Tag'), 'noindex, nofollow');
+  assert.equal((await fetchLocal('/api/missing')).status, 404);
+  assert.equal((await fetchLocal('/api/contact')).status, 405);
+  const response = await fetchLocal('/api/contact', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Origin: origin },
     body: '{}',
@@ -71,10 +81,11 @@ try {
   assert.equal(response.status, 503);
   assert.equal((await response.json()).ok, false);
   assert.equal(response.headers.get('Cache-Control'), 'no-store');
-  const robots = await (await fetch(origin + '/robots.txt')).text();
+  assert.equal(response.headers.get('X-Robots-Tag'), 'noindex, nofollow');
+  const robots = await (await fetchLocal('/robots.txt')).text();
   assert.ok(robots.includes('\nDisallow: /api/\n'));
   console.log(
-    'Verified local Worker static routes, branded 404, API methods, disabled submissions, robots, and security headers.',
+    `Verified local ${production ? 'production' : 'staging'} Worker static routes, indexing policy, branded 404, API methods, disabled submissions, robots, and security headers.`,
   );
 } catch (error) {
   console.error(output);

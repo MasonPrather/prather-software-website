@@ -27,9 +27,9 @@ npx playwright install chromium firefox webkit
 npm run verify
 ```
 
-`verify` runs Astro and Worker type checks, a static build, contact security unit tests, local link and sitemap checks, local Worker runtime checks, isolated product fixture builds, browser/WCAG checks in Chromium at 375/768/1440 px, Firefox at 1440 px, and Playwright WebKit at 375 px, plus a 320 px overflow check, and a Wrangler packaging dry run. `npm run test:e2e` expects an existing `dist/` build and starts Astro preview automatically. The active-form browser fixture builds to ignored `.test-dist/`; Turnstile and mail responses are mocked, and the production `dist/` remains disabled. GitHub Actions runs these gates and an advisory audit on pushes and pull requests. It has no deployment job and needs no deployment credentials.
+`verify` runs Astro and Worker type checks, a static build, contact security unit tests, local link and sitemap checks, local Worker runtime checks, isolated product fixture builds, browser/WCAG checks in Chromium at 375/768/1440 px, Firefox at 1440 px, and Playwright WebKit at 375 px, plus a 320 px overflow check, and Wrangler packaging dry runs for staging and production. `npm run test:e2e` expects an existing `dist/` build and starts Astro preview automatically. The active-form browser fixture builds to ignored `.test-dist/`; Turnstile and mail responses are mocked, and the production `dist/` remains disabled. GitHub Actions runs these gates and an advisory audit on pushes and pull requests. It has no deployment job and needs no deployment credentials.
 
-Automated accessibility checks do not establish complete WCAG conformance. Manual assistive technology review, actual Safari, and real device coverage remain required before production signoff.
+Automated accessibility checks do not establish complete WCAG conformance. Manual assistive technology review, actual Safari, and real device coverage remain unverified.
 
 ## Structure
 
@@ -55,6 +55,6 @@ The contact implementation validates and limits requests server-side, checks sam
 
 The UI, server enable flag, and delivery-verification flag default off. Configure real Turnstile keys/allowed hosts, a verified sender and recipient, and private environment secrets; verify a real accepted message and token replay rejection in staging before activating the form. Resend is an unconfigured implementation choice; no account, paid plan, or remote resource has been created.
 
-The verified Cloudflare account is pinned in Wrangler configuration. Cloudflare app authentication and Wrangler CLI authentication are separate. The existing `privacy.prathersoftware.com` Worker is outside this deployment and must be preserved. No production DNS, custom domain, or deployment is configured by this change. Review [the staging guide](docs/cloudflare-staging.md) and obtain approval before production deployment or DNS changes. Contact/privacy text and retention practices must match the selected live configuration before activation.
+The verified Cloudflare account is pinned in Wrangler configuration. Cloudflare app authentication and Wrangler CLI authentication are separate. The default target remains staging with indexing disabled. The explicit `production` environment targets `prather-software-website`, serves `prathersoftware.com`, and redirects `www` to the HTTPS apex. Contact remains disabled in both environments. The separate `privacy.prathersoftware.com` Worker and email DNS must be preserved. The owner authorized the initial production launch on October 29, 2026; future deployments still require authorization. Follow [the production runbook](docs/production.md) and [the staging guide](docs/cloudflare-staging.md). Contact/privacy text and retention practices must match the selected live configuration before form activation.
 
 See [the verification record](docs/milestone-2-verification.md) for tested scope and remaining production checks.

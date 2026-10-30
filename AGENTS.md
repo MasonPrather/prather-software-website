@@ -8,6 +8,7 @@
 - `npm run check` validates Astro/TypeScript and the separate Worker TypeScript project.
 - Before completing a change, run the relevant checks. Before a PR, run `npm run verify` and `npm audit --audit-level=high`. Install the test browser with `npx playwright install chromium firefox webkit` first.
 - Keep Astro static-first. The Worker serves `ASSETS` and a contact endpoint; avoid adding a server adapter, UI framework, database, R2 storage, or client-side library without a demonstrated need.
+- The default Wrangler target is staging. Use `--env production` explicitly for the apex/www production Worker; preserve the separate privacy Worker and all email DNS. Both contact gates must remain off until real staging verification.
 - Generate Worker environment declarations using `npm run worker:types` after changing bindings. Do not hand-edit generated declarations.
 
 ## Truthful content

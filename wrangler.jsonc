@@ -14,6 +14,7 @@
     "not_found_handling": "404-page",
   },
   "vars": {
+    "SITE_INDEXING": "disabled",
     "CONTACT_ENABLED": "false",
     "CONTACT_DELIVERY_VERIFIED": "false",
     "ALLOWED_ORIGIN": "http://localhost:8787",
@@ -28,6 +29,33 @@
       "simple": { "limit": 5, "period": 60 },
     },
   ],
+  "env": {
+    "production": {
+      "name": "prather-software-website",
+      "workers_dev": false,
+      "preview_urls": false,
+      "routes": [
+        { "pattern": "prathersoftware.com", "custom_domain": true },
+        { "pattern": "www.prathersoftware.com", "custom_domain": true },
+      ],
+      "vars": {
+        "SITE_INDEXING": "enabled",
+        "CONTACT_ENABLED": "false",
+        "CONTACT_DELIVERY_VERIFIED": "false",
+        "ALLOWED_ORIGIN": "https://prathersoftware.com",
+        "TURNSTILE_HOSTNAME": "prathersoftware.com",
+        "CONTACT_FROM": "",
+        "CONTACT_TO": "",
+      },
+      "ratelimits": [
+        {
+          "name": "CONTACT_RATE_LIMITER",
+          "namespace_id": "1002",
+          "simple": { "limit": 5, "period": 60 },
+        },
+      ],
+    },
+  },
   "observability": {
     "enabled": true,
     "logs": { "enabled": true, "head_sampling_rate": 1 },

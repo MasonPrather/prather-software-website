@@ -253,12 +253,29 @@ export async function handleContact(
     );
   }
 }
-export function applySecurityHeaders(response: Response): Response {
+export function canonicalRedirect(request: Request): Response | null {
+  const url = new URL(request.url);
+  if (
+    url.hostname !== 'www.prathersoftware.com' &&
+    !(url.hostname === 'prathersoftware.com' && url.protocol === 'http:')
+  )
+    return null;
+  url.protocol = 'https:';
+  url.host = 'prathersoftware.com';
+  url.port = '';
+  return Response.redirect(url.toString(), 308);
+}
+
+export function applySecurityHeaders(
+  response: Response,
+  allowIndexing = false,
+): Response {
   const result = new Response(response.body, response);
   result.headers.set('X-Content-Type-Options', 'nosniff');
   result.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
   result.headers.set('X-Frame-Options', 'DENY');
-  result.headers.set('X-Robots-Tag', 'noindex, nofollow');
+  if (!allowIndexing || response.status >= 400)
+    result.headers.set('X-Robots-Tag', 'noindex, nofollow');
   result.headers.set(
     'Permissions-Policy',
     'camera=(), microphone=(), geolocation=()',
@@ -284,6 +301,9 @@ export function applySecurityHeaders(response: Response): Response {
 export default {
   async fetch(request, env): Promise<Response> {
     try {
+      const indexingEnabled = env.SITE_INDEXING === 'enabled';
+      const redirect = indexingEnabled ? canonicalRedirect(request) : null;
+      if (redirect) return applySecurityHeaders(redirect, true);
       const pathname = new URL(request.url).pathname;
       const response =
         pathname === '/api/contact' || pathname === '/api/contact/'
@@ -291,7 +311,10 @@ export default {
           : pathname.startsWith('/api/')
             ? json(404, 'Endpoint not found.')
             : await env.ASSETS.fetch(request);
-      return applySecurityHeaders(response);
+      return applySecurityHeaders(
+        response,
+        indexingEnabled && !pathname.startsWith('/api/'),
+      );
     } catch {
       console.error(JSON.stringify({ event: 'request_failed' }));
       return applySecurityHeaders(
