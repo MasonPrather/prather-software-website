@@ -30,4 +30,4 @@ Verified locally on October 29, 2026 with Node 25.8.1, npm 11.11.0, Astro 7.4.4,
 - Final brand assets, confirmed release availability/store links/pricing, operational privacy/retention review. The lettermark is provisional.
 - The owner authorized production launch on October 29, 2026. Deployment and live verification are recorded in [production operations](production.md). Staging stays noindex; successful production pages allow indexing.
 
-See [Cloudflare staging](cloudflare-staging.md) for the remaining setup and verification sequence. GitHub Actions results are available on the pull request once pushed.
+See [Cloudflare staging](cloudflare-staging.md) for the remaining setup and verification sequence. The release CI passed before the authorized production launch. Live HTTP/build-parity and Chromium checks passed; deployment version, source commit, preserved privacy/email configuration, and remaining limitations are recorded in [production operations](production.md).

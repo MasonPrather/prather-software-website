@@ -1,0 +1,14 @@
+{
+  "name": "Website configuration",
+  "kind": "zone",
+  "phase": "http_config_settings",
+  "rules": [
+    {
+      "action": "set_config",
+      "expression": "(http.host in {\"prathersoftware.com\" \"www.prathersoftware.com\"})",
+      "action_parameters": { "disable_rum": true },
+      "description": "Disable unintended analytics on main website",
+      "enabled": true
+    }
+  ]
+}

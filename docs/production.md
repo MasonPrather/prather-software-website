@@ -27,7 +27,7 @@ npx wrangler deploy --env production
 
 `verify` includes local staging/production runtime checks and dry runs for both configurations. The app connector and Wrangler CLI authenticate separately. Wrangler OAuth may store credentials in the OS Keychain with `--use-keyring`; never copy connector tokens or paste credentials into chat. Use the verified account above. Adding Custom Domains requires Workers Routes Write for the zone as well as Worker deployment access. Cloudflare provisions DNS and certificates for the exact Custom Domains; do not add wildcard routes.
 
-After deployment, verify HTTPS and all sitemap pages, static assets, canonical/OG metadata, robots/sitemap, www redirect, branded 404 status, security headers, production indexing, and contact unavailability. Check the existing privacy domain and its Worker metadata for unintended changes. Run `npm run test:production` against the deployed site and this exact `dist/` build. It compares all sitemap pages and non-HTML assets byte-for-byte, checks domain redirects and security headers, and sends one empty POST to confirm collection is disabled. It also prints the separate privacy page hash for comparison with the release baseline. This remote check is intentionally excluded from PR/local CI; update its disabled-contact expectation only after a separately verified activation. Record the deployed source commit and Cloudflare version ID below. A successful upload alone does not establish a working live site.
+After deployment, verify HTTPS and all sitemap pages, static assets, canonical/OG metadata, robots/sitemap, www redirect, branded 404 status, security headers, production indexing, and contact unavailability. Check the existing privacy domain and its Worker metadata for unintended changes. Run `npm run test:production` and `npm run test:production:browser` against the deployed site and this exact `dist/` build. It compares all sitemap pages and non-HTML assets byte-for-byte, checks domain redirects and security headers, and sends one empty POST to confirm collection is disabled. It also prints the separate privacy page hash for comparison with the release baseline. This remote check is intentionally excluded from PR/local CI; update its disabled-contact expectation only after a separately verified activation. Record the deployed source commit and Cloudflare version ID below. A successful upload alone does not establish a working live site.
 
 ## Contact activation is a separate release
 
@@ -41,10 +41,27 @@ Inspect `npx wrangler deployments list --env production` and identify a verified
 
 ## Launch record
 
-Pending deployment and live verification. Do not treat this runbook as proof that the domain is live.
+Launched October 29, 2026 at approximately 9:32 PM America/New_York (October 30 at 01:32 UTC), with explicit owner authorization.
+
+- Website: [https://prathersoftware.com](https://prathersoftware.com).
+- Deployed source: `ca8b6bfe0e9576e01ad3f3d000e1650e8ef57fe0` on `feature/milestone-2-website`.
+- Worker version: `99b44f09-0ace-4c8c-8f21-5954f4378009`, tag `ca8b6bf`.
+- [Release CI](https://github.com/MasonPrather/prather-software-website/actions/runs/40985210550) passed on Node 24 Ubuntu before deployment. Full local verification passed: 38 unit tests, 165 browser tests, both runtime environments and dry runs, 429 local references, publication fixtures, and zero dependency audit vulnerabilities.
+- Live `npm run test:production` passed for 17 sitemap pages and seven non-HTML assets, each matching the release build byte-for-byte. HTTPS/www redirects preserve path/query, public indexing is enabled, and security/404/contact-disabled responses match expectations.
+- Live `npm run test:production:browser` passed in Chromium at 375/768/1440 px for Home, Quest Theater and Contact, plus product-dropdown navigation. No overflow, page/console errors, injected analytics script, or violations in the selected automated WCAG A/AA rules were detected. This remains automated coverage; manual screen readers, actual Safari and physical devices are unverified.
+- Existing privacy URL still redirects to `https://privacy.prathersoftware.com/quest-theater/` and returns 200. Its pre/post SHA-256 is identical: `39f28d3ba5f389520791143ecffffbd557beb639ac9e47bf5bdcd850392ea4a6`. Its Worker ETag, modified timestamp, custom domain and DNS record remained unchanged. Google MX/SPF/DKIM/verification record IDs, contents and modified timestamps also remained unchanged.
+- Contact remains disabled in the frontend and both server gates. No Turnstile widget, email account, sender credential, or paid service was created.
+- [Pull request #1](https://github.com/MasonPrather/prather-software-website/pull/1) remains open and unmerged. Subsequent documentation and verification-script commits do not change the deployed application source.
+
+### Host-specific analytics exclusion
+
+The live browser check detected a Cloudflare-injected analytics beacon blocked by the site's CSP, even though the account's Web Analytics site list was empty and the zone RUM setting reported off. An explicit Configuration Rule now disables RUM for only `prathersoftware.com` and `www.prathersoftware.com`. The privacy subdomain does not match the expression.
+
+The applied reference is [ops/cloudflare-main-site-rule.json](../ops/cloudflare-main-site-rule.json). Cloudflare ruleset ID: `cb552664bccf42a3979fe56f7403e55c`; rule ID: `e3d7fb6eaae3475dba96b2fd21fed483`; phase: `http_config_settings`. The phase had no entrypoint ruleset before creation. This external configuration is not managed by Wrangler or an automated deployment job. Read/reconcile the existing ruleset before future changes and update only this rule; preserve unrelated rules. The live browser regression command asserts the beacon stays absent.
 
 ## References
 
 - [Workers Custom Domains](https://developers.cloudflare.com/workers/configuration/routing/custom-domains/)
 - [Wrangler environments](https://developers.cloudflare.com/workers/wrangler/environments/)
+- [Disable RUM with Configuration Rules](https://developers.cloudflare.com/rules/configuration-rules/settings/#disable-real-user-monitoring-rum)
 - [Workers authorization](https://developers.cloudflare.com/workers/authorization/workers/)
