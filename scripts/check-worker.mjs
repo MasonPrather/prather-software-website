@@ -48,13 +48,7 @@ try {
     await delay(250);
   }
   assert.ok(ready, 'Worker did not start: ' + output);
-  for (const route of [
-    '/',
-    '/services/',
-    '/work/',
-    '/products/software/',
-    '/contact/',
-  ]) {
+  for (const route of ['/', '/services/', '/products/software/', '/contact/']) {
     const response = await fetchLocal(route);
     assert.equal(response.status, 200, route);
     assert.equal(response.headers.get('X-Content-Type-Options'), 'nosniff');
@@ -67,6 +61,16 @@ try {
         .get('Content-Security-Policy')
         ?.includes("frame-ancestors 'none'"),
     );
+  }
+  for (const route of [
+    '/work/',
+    '/work/collaborative-xr-research/',
+    '/work/adaptive-vr-classroom/',
+    '/work/programmable-network-telemetry/',
+  ]) {
+    const retired = await fetchLocal(route);
+    assert.equal(retired.status, 404, route);
+    assert.equal(retired.headers.get('X-Robots-Tag'), 'noindex, nofollow');
   }
   const missing = await fetchLocal('/missing-route/');
   assert.equal(missing.status, 404);

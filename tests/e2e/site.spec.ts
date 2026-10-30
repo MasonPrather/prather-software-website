@@ -9,7 +9,6 @@ const tabKey = (browserName: string) =>
 const routes = [
   '/',
   '/services/',
-  '/work/',
   '/products/',
   '/products/software/',
   '/products/games/',
@@ -21,9 +20,6 @@ const routes = [
   '/about/team/',
   '/contact/',
   '/privacy/',
-  '/work/collaborative-xr-research/',
-  '/work/adaptive-vr-classroom/',
-  '/work/programmable-network-telemetry/',
 ];
 
 for (const route of routes) {
@@ -34,6 +30,10 @@ for (const route of routes) {
     expect(response?.status()).toBe(200);
     await expect(page.locator('h1')).toHaveCount(1);
     await expect(page.locator('main')).toBeVisible();
+    await expect(page.locator('a[href^="/work"]')).toHaveCount(0);
+    await expect(
+      page.getByRole('link', { name: 'Our Work', exact: true }),
+    ).toHaveCount(0);
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
     await expect(page.locator('meta[name="description"]')).toHaveAttribute(
       'content',

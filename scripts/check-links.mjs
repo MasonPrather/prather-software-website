@@ -20,6 +20,11 @@ let links = 0;
 for (const page of pages) {
   const html = await readFile(page, 'utf8');
   assert.match(html, /<html[^>]+lang="en"/, `${page}: language missing`);
+  assert.doesNotMatch(
+    html,
+    /href="\/work(?:\/|")/,
+    `${page}: retired portfolio link remains`,
+  );
   assert.equal(
     (html.match(/<h1(?:\s|>)/g) ?? []).length,
     1,
@@ -64,7 +69,25 @@ for (const match of sitemap.matchAll(
   const file = path.join(root, match[1], 'index.html');
   await stat(file);
 }
-assert.ok(pages.length >= 13, 'Expected public pages and three case studies');
+assert.ok(
+  pages.length >= 14,
+  'Expected client services, products, and company pages',
+);
+assert.ok(
+  !sitemap.includes('https://prathersoftware.com/work/'),
+  'Retired portfolio URLs must not appear in the sitemap',
+);
+for (const route of [
+  'work/index.html',
+  'work/collaborative-xr-research/index.html',
+  'work/adaptive-vr-classroom/index.html',
+  'work/programmable-network-telemetry/index.html',
+]) {
+  await assert.rejects(
+    stat(path.join(root, route)),
+    `${route}: retired portfolio output remains`,
+  );
+}
 console.log(
   `Verified ${pages.length} HTML pages, ${links} local references, and sitemap routes.`,
 );

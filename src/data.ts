@@ -13,7 +13,7 @@ export const services = [
   ],
   [
     'Specialized Engineering',
-    'XR/VR, real-time 3D, simulation, visualization, and research prototypes.',
+    'XR/VR, real-time 3D, simulation, visualization, and interactive prototypes.',
   ],
 ] as const;
 export const serviceDetails = [
@@ -60,7 +60,7 @@ export const serviceDetails = [
     capabilities: [
       'XR and immersive application development',
       'Real-time 3D, simulation, and visualization',
-      'Research software and feasibility prototypes',
+      'Interactive software and feasibility prototypes',
     ],
     approach:
       'Make technical uncertainty explicit, prototype difficult parts early, and distinguish experimental findings from production claims.',

@@ -18,7 +18,6 @@ export const GET: APIRoute = async ({ site }) => {
   const paths = [
     '/',
     '/services/',
-    '/work/',
     '/products/',
     '/products/software/',
     '/products/games/',
@@ -27,16 +26,12 @@ export const GET: APIRoute = async ({ site }) => {
     '/contact/',
     '/privacy/',
   ];
-  for (const category of ['work', 'software', 'games'] as const) {
+  for (const category of ['software', 'games'] as const) {
     for (const entry of await getCollection(
       category,
       ({ data }) => data.published,
     ))
-      paths.push(
-        category === 'work'
-          ? `/work/${entry.id}/`
-          : `/products/${category}/${entry.id}/`,
-      );
+      paths.push(`/products/${category}/${entry.id}/`);
   }
   const urls = [...new Set(paths)]
     .sort()

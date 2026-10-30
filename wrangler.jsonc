@@ -6,6 +6,9 @@
   "compatibility_date": "2026-10-29",
   "workers_dev": false,
   "preview_urls": false,
+  "routes": [
+    { "pattern": "staging.prathersoftware.com", "custom_domain": true },
+  ],
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",
@@ -17,10 +20,10 @@
     "SITE_INDEXING": "disabled",
     "CONTACT_ENABLED": "false",
     "CONTACT_DELIVERY_VERIFIED": "false",
-    "ALLOWED_ORIGIN": "http://localhost:8787",
-    "TURNSTILE_HOSTNAME": "localhost",
+    "ALLOWED_ORIGIN": "https://staging.prathersoftware.com",
+    "TURNSTILE_HOSTNAME": "staging.prathersoftware.com",
     "CONTACT_FROM": "",
-    "CONTACT_TO": "",
+    "CONTACT_TO": "contact@prathersoftware.com",
   },
   "ratelimits": [
     {
@@ -45,7 +48,7 @@
         "ALLOWED_ORIGIN": "https://prathersoftware.com",
         "TURNSTILE_HOSTNAME": "prathersoftware.com",
         "CONTACT_FROM": "",
-        "CONTACT_TO": "",
+        "CONTACT_TO": "contact@prathersoftware.com",
       },
       "ratelimits": [
         {

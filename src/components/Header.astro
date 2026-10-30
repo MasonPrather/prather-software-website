@@ -38,9 +38,6 @@ const current = (href: string) =>
       <a href="/services/" aria-current={current('/services')}>
         Services
       </a>
-      <a href="/work/" aria-current={current('/work')}>
-        Our Work
-      </a>
       <details class="nav-dropdown">
         <summary
           class:list={[pathname.startsWith('/products') && 'section-current']}

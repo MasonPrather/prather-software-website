@@ -4,9 +4,6 @@ import SectionHeading from '../components/SectionHeading.astro';
 import ProductCard from '../components/ProductCard.astro';
 import { services } from '../data';
 import { getCollection } from 'astro:content';
-const projects = (
-  await getCollection('work', ({ data }) => data.published)
-).sort((a, b) => a.data.title.localeCompare(b.data.title));
 const featuredProducts = [
   ...(
     await getCollection(
@@ -175,38 +172,10 @@ const process = [
       </div>
     </div>
   </section>
-  <section class="section">
-    <div class="wrap">
-      <div class="heading-row">
-        <SectionHeading
-          eyebrow="03 / SELECTED EXPERIENCE"
-          title="Engineering in practice."
-          description="A look at the founder’s academic research and prior professional experience. These projects are distinguished from Prather Software client engagements."
-        />
-        <a class="text-link" href="/work/">
-          Our work <span aria-hidden="true">↗</span>
-        </a>
-      </div>
-      <div class="work-grid">
-        {projects.map((project) => (
-          <a class="card work-card" href={`/work/${project.id}/`}>
-            <p class="eyebrow">{project.data.category}</p>
-            <h3>
-              {project.data.title} <span aria-hidden="true">↗</span>
-            </h3>
-            <p>{project.data.summary}</p>
-            <span class="card-link">
-              View experience <span aria-hidden="true">↗</span>
-            </span>
-          </a>
-        ))}
-      </div>
-    </div>
-  </section>
   <section class="section dark publishing-section">
     <div class="wrap">
       <SectionHeading
-        eyebrow="04 / INDEPENDENT PRODUCTS"
+        eyebrow="03 / INDEPENDENT PRODUCTS"
         title="Built from our own curiosity."
         description="From theater-style viewing on Quest to mobile party games, standalone PC games, and VR suspense. Explore our original software and games."
       />
@@ -228,7 +197,7 @@ const process = [
   <section class="section">
     <div class="wrap">
       <SectionHeading
-        eyebrow="05 / HOW WE WORK"
+        eyebrow="04 / HOW WE WORK"
         title="A clear path from idea to delivery."
       />
       <ol class="process-grid" role="list">
@@ -435,32 +404,6 @@ const process = [
     font-size: 0.95rem;
     margin: 0;
   }
-  .work-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 20px;
-  }
-  .work-card {
-    display: flex !important;
-    flex-direction: column;
-    padding: 28px;
-  }
-  .work-card h3 {
-    font-size: 1.5rem;
-    margin: 12px 0 16px;
-  }
-  .work-card p {
-    font-size: 0.9rem;
-  }
-  .work-card .eyebrow {
-    font-size: 9px;
-    margin-bottom: 0;
-  }
-  .work-card .card-link {
-    margin-top: auto;
-    padding-top: 28px;
-  }
-
   .process-grid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -518,15 +461,6 @@ const process = [
       gap: 20px;
       font-size: 8px;
     }
-    .work-grid {
-      gap: 14px;
-    }
-    .work-card {
-      padding: 23px;
-    }
-    .work-card h3 {
-      font-size: 1.3rem;
-    }
     .cta-inner {
       align-items: flex-start;
       flex-direction: column;
@@ -563,12 +497,6 @@ const process = [
     }
     .strip-end {
       margin-left: 0;
-    }
-    .work-grid {
-      grid-template-columns: 1fr;
-    }
-    .work-card h3 {
-      font-size: 1.5rem;
     }
     .process-grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));

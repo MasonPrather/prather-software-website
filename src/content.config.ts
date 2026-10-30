@@ -2,24 +2,6 @@ import { defineCollection } from 'astro:content';
 import { z } from 'astro/zod';
 import { glob } from 'astro/loaders';
 const text = z.string().trim().min(1);
-const work = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/work' }),
-  schema: z.object({
-    title: text,
-    category: z.enum([
-      'Academic research',
-      'Prior professional experience',
-      'Independent project',
-      'Prather Software client engagement',
-    ]),
-    summary: text.max(240),
-    role: text,
-    technologies: z.array(text).min(1),
-    outcome: text,
-    published: z.boolean().default(false),
-    order: z.number().int().default(100),
-  }),
-});
 const productSchema = z
   .object({
     title: text,
@@ -67,4 +49,4 @@ const games = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/games' }),
   schema: productSchema,
 });
-export const collections = { work, software, games };
+export const collections = { software, games };
