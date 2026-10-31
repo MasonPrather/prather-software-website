@@ -1,4 +1,10 @@
 import { inquiryCategories, validateContact } from '../src/lib/contact';
+import {
+  gmailConfigured,
+  isMailboxAddress,
+  sendGmailInquiry,
+  type GmailEnvironment,
+} from './gmail';
 
 export type ContactEnvironment = Pick<
   Env,
@@ -9,7 +15,8 @@ export type ContactEnvironment = Pick<
   | 'CONTACT_FROM'
   | 'CONTACT_TO'
   | 'CONTACT_RATE_LIMITER'
-> & { TURNSTILE_SECRET?: string; RESEND_API_KEY?: string };
+> &
+  GmailEnvironment & { TURNSTILE_SECRET?: string };
 const MAX_BODY_BYTES = 16_384;
 const REQUEST_TIMEOUT_MS = 10_000;
 function json(
@@ -70,7 +77,7 @@ function ready(env: ContactEnvironment): boolean {
     env.CONTACT_DELIVERY_VERIFIED === 'true' &&
     Boolean(
       env.TURNSTILE_SECRET?.trim() &&
-      env.RESEND_API_KEY?.trim() &&
+      gmailConfigured(env) &&
       env.CONTACT_RATE_LIMITER &&
       env.CONTACT_FROM?.trim() &&
       env.CONTACT_TO?.trim() &&
@@ -163,6 +170,10 @@ export async function handleContact(
       errors: result.errors,
     });
   const submission = result.value;
+  if (!isMailboxAddress(submission.email))
+    return json(422, 'Please check the highlighted fields.', {
+      errors: { email: 'Enter a valid single email address.' },
+    });
   try {
     const verification = await fetcher(
       'https://challenges.cloudflare.com/turnstile/v0/siteverify',
@@ -173,6 +184,7 @@ export async function handleContact(
           secret: env.TURNSTILE_SECRET!,
           response: submission.token,
         }),
+        redirect: 'error',
         signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
       },
     );
@@ -209,35 +221,17 @@ export async function handleContact(
     const category = inquiryCategories.find(
       (item) => item.value === submission.category,
     )!.label;
-    const delivery = await fetcher('https://api.resend.com/emails', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${env.RESEND_API_KEY!}`,
-        'Content-Type': 'application/json',
-        'Idempotency-Key': crypto.randomUUID(),
+    const accepted = await sendGmailInquiry(
+      env,
+      {
+        name: submission.name,
+        email: submission.email,
+        categoryLabel: category,
+        message: submission.message,
       },
-      body: JSON.stringify({
-        from: env.CONTACT_FROM,
-        to: [env.CONTACT_TO],
-        reply_to: submission.email,
-        subject: `Website inquiry: ${category}`,
-        text: `Name: ${submission.name}\nEmail: ${submission.email}\nInquiry: ${category}\n\n${submission.message}`,
-      }),
-      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
-    });
-    if (!delivery.ok)
-      return json(
-        502,
-        'The email service did not accept your inquiry. Please try again later.',
-      );
-    const receipt: unknown = await delivery.json();
-    if (
-      !receipt ||
-      typeof receipt !== 'object' ||
-      !('id' in receipt) ||
-      typeof receipt.id !== 'string' ||
-      !receipt.id.trim()
-    )
+      fetcher,
+    );
+    if (!accepted)
       return json(
         502,
         'The email service did not confirm acceptance. Please try again later.',

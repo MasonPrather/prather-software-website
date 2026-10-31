@@ -1,16 +1,17 @@
 ---
 import Base from '../layouts/Base.astro';
 import PageHero from '../components/PageHero.astro';
+const contactEnabled = import.meta.env.PUBLIC_CONTACT_ENABLED === 'true';
 ---
 
 <Base
   title="Privacy Notice | Prather Software"
-  description="How Prather Software handles website visits and contact inquiries, including the planned use of Cloudflare Turnstile and transactional email delivery."
+  description="How Prather Software handles website visits and contact inquiries, including Cloudflare Turnstile and Google Workspace email processing."
 >
   <PageHero
     eyebrow="Privacy"
     title="Clear about what you share."
-    description="This notice describes the website’s current configuration and the contact processing planned for launch. Last updated October 29, 2026."
+    description="This notice describes the website’s current configuration and how contact inquiries are processed."
   />
   <section class="section">
     <div class="wrap prose privacy-copy">
@@ -22,30 +23,36 @@ import PageHero from '../components/PageHero.astro';
         and diagnose errors.
       </p>
       <h2>Contact inquiries</h2>
+      {contactEnabled ? (
+        <p>
+          The inquiry form requests your name, email address, inquiry category,
+          and message so Prather Software can review and respond. Do not submit
+          passwords, payment details, or sensitive personal information.
+        </p>
+      ) : (
+        <p>
+          The public inquiry form remains disabled while sender authorization
+          and delivery verification are completed. No inquiry data is
+          transmitted while it is disabled. Once enabled, it will request your
+          name, email address, inquiry category, and message so Prather Software
+          can review and respond. Do not submit passwords, payment details, or
+          sensitive personal information.
+        </p>
+      )}
       <p>
-        The public inquiry form remains unavailable until spam protection and
-        email delivery are configured and verified. No inquiry data is
-        transmitted while the form is disabled. Once enabled, it will request
-        your name, email address, inquiry category, and message so Prather
-        Software can review and respond. Do not submit passwords, payment
-        details, or sensitive personal information.
-      </p>
-      <p>
-        The contact implementation validates submissions on the server, uses
-        Cloudflare Turnstile to help prevent abuse, and sends accepted inquiries
-        through a transactional email provider. The implementation supports
-        Resend; provider configuration and a verified sending identity are
-        required before activation. Submission success means the email provider
-        accepted the message and does not guarantee inbox delivery.
+        The contact service validates submissions on the server and uses
+        Cloudflare Turnstile to help prevent abuse. Accepted inquiries are sent
+        through the Gmail API to Prather Software’s Google Workspace mailbox.
+        Submission success means Gmail accepted the message; it does not
+        guarantee inbox delivery.
       </p>
       <h2>Service providers and security</h2>
       <p>
         Cloudflare processes technical information for hosting and, when
-        enabled, Turnstile verification and abuse prevention. An enabled email
-        provider processes the inquiry to transmit it to Prather Software. The
-        contact service does not store inquiries in a database. Application logs
-        record operational errors without inquiry message bodies or email
-        addresses.
+        enabled, Turnstile verification and abuse prevention. Google processes
+        inquiry email through Google Workspace. The contact service does not
+        store inquiries in a database. Application logs record operational
+        errors without inquiry message bodies or email addresses.
       </p>
       <p>
         Learn more from{' '}
@@ -59,24 +66,23 @@ import PageHero from '../components/PageHero.astro';
         and{' '}
         <a
           class="text-link"
-          href="https://resend.com/legal/privacy-policy"
+          href="https://policies.google.com/privacy"
           rel="noopener noreferrer"
         >
-          Resend’s privacy policy
+          Google’s privacy policy
         </a>
         .
       </p>
       <h2>Retention and privacy questions</h2>
       <p>
         Inquiries may be retained in the company’s email system to respond and
-        manage the related business conversation. A detailed retention schedule
-        and operational privacy review remain required before the contact
-        service goes live.
+        manage the related business conversation. The website does not
+        automatically delete email conversations from that mailbox.
       </p>
       <p>
-        When contact submissions are available, use the General inquiry category
-        to ask about your information or request a correction or deletion. This
-        notice will be updated if the website’s data practices change.
+        For questions about your information or to request a correction or
+        deletion, email contact@prathersoftware.com. This notice will be updated
+        if the website’s data practices change.
       </p>
       <h2>External links</h2>
       <p>

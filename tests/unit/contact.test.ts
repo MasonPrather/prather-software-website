@@ -72,7 +72,9 @@ function environment(
     CONTACT_FROM: 'site@example.com',
     CONTACT_TO: 'hello@example.com',
     TURNSTILE_SECRET: 'unit-test-secret',
-    RESEND_API_KEY: 'unit-test-provider-key',
+    GMAIL_CLIENT_ID: 'unit-test-client-id',
+    GMAIL_CLIENT_SECRET: 'unit-test-client-secret',
+    GMAIL_REFRESH_TOKEN: 'unit-test-refresh-token',
     CONTACT_RATE_LIMITER: { limit: async () => ({ success: true }) },
     ...overrides,
   } as ContactEnvironment;
@@ -92,7 +94,16 @@ function providerMock(
     calls.push({ url, init });
     if (url === 'https://challenges.cloudflare.com/turnstile/v0/siteverify')
       return Response.json(verdict);
-    assert.equal(url, 'https://api.resend.com/emails');
+    if (url === 'https://oauth2.googleapis.com/token')
+      return Response.json({
+        access_token: 'unit-test-access-token',
+        token_type: 'Bearer',
+        expires_in: 3600,
+      });
+    assert.equal(
+      url,
+      'https://gmail.googleapis.com/gmail/v1/users/me/messages/send',
+    );
     return Response.json(receipt, { status: mailStatus });
   }) as typeof fetch;
   return { fetcher, calls };
@@ -107,7 +118,9 @@ for (const [label, override] of [
   ['disabled contact', { CONTACT_ENABLED: 'false' }],
   ['unverified delivery', { CONTACT_DELIVERY_VERIFIED: 'false' }],
   ['missing Turnstile secret', { TURNSTILE_SECRET: '' }],
-  ['missing email key', { RESEND_API_KEY: '' }],
+  ['missing Gmail client ID', { GMAIL_CLIENT_ID: '' }],
+  ['missing Gmail client secret', { GMAIL_CLIENT_SECRET: '' }],
+  ['missing Gmail refresh token', { GMAIL_REFRESH_TOKEN: '' }],
   ['missing rate binding', { CONTACT_RATE_LIMITER: undefined }],
 ] as const) {
   test(`${label} prevents all external calls`, async () => {
@@ -303,7 +316,7 @@ for (const [label, receipt, status] of [
       ),
       502,
     );
-    assert.equal(mock.calls.length, 2);
+    assert.equal(mock.calls.length, 3);
   });
 }
 test('success requires verification and a real-shaped provider acceptance receipt', async () => {
@@ -318,7 +331,7 @@ test('success requires verification and a real-shaped provider acceptance receip
   assert.equal(result.ok, true);
   assert.match(result.message, /accepted by our email service/);
   assert.doesNotMatch(result.message, /delivered to|inbox/i);
-  assert.equal(mock.calls.length, 2);
+  assert.equal(mock.calls.length, 3);
   const verification = new URLSearchParams(
     mock.calls[0]!.init!.body as URLSearchParams,
   );
@@ -326,10 +339,24 @@ test('success requires verification and a real-shaped provider acceptance receip
     verification.get('response'),
     validSubmission['cf-turnstile-response'],
   );
-  const mail = JSON.parse(mock.calls[1]!.init!.body as string);
-  assert.deepEqual(mail.to, ['hello@example.com']);
-  assert.equal(mail.reply_to, 'ada@example.com');
-  assert.equal(mail.subject, 'Website inquiry: Project consultation');
-  assert.ok(mail.text.includes(validSubmission.message));
-  assert.equal(mail.html, undefined);
+  const grant = new URLSearchParams(
+    mock.calls[1]!.init!.body as URLSearchParams,
+  );
+  assert.equal(grant.get('grant_type'), 'refresh_token');
+  assert.equal(grant.get('client_id'), 'unit-test-client-id');
+  assert.equal(grant.get('client_secret'), 'unit-test-client-secret');
+  assert.equal(grant.get('refresh_token'), 'unit-test-refresh-token');
+  const mail = JSON.parse(mock.calls[2]!.init!.body as string);
+  const mime = Buffer.from(mail.raw, 'base64url').toString('utf8');
+  assert.match(mime, /^From: site@example.com\r\n/m);
+  assert.match(mime, /^To: hello@example.com\r\n/m);
+  assert.match(mime, /^Reply-To: ada@example.com\r\n/m);
+  assert.match(mime, /^Subject: Website inquiry: Project consultation\r\n/m);
+  assert.match(mime, /^Content-Transfer-Encoding: base64\r\n/m);
+  const body = mime.split('\r\n\r\n').slice(1).join('\r\n\r\n');
+  assert.ok(
+    Buffer.from(body, 'base64')
+      .toString('utf8')
+      .includes(validSubmission.message),
+  );
 });

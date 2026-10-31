@@ -22,7 +22,7 @@
     "CONTACT_DELIVERY_VERIFIED": "false",
     "ALLOWED_ORIGIN": "https://staging.prathersoftware.com",
     "TURNSTILE_HOSTNAME": "staging.prathersoftware.com",
-    "CONTACT_FROM": "",
+    "CONTACT_FROM": "contact@prathersoftware.com",
     "CONTACT_TO": "contact@prathersoftware.com",
   },
   "ratelimits": [
@@ -47,7 +47,7 @@
         "CONTACT_DELIVERY_VERIFIED": "false",
         "ALLOWED_ORIGIN": "https://prathersoftware.com",
         "TURNSTILE_HOSTNAME": "prathersoftware.com",
-        "CONTACT_FROM": "",
+        "CONTACT_FROM": "contact@prathersoftware.com",
         "CONTACT_TO": "contact@prathersoftware.com",
       },
       "ratelimits": [
