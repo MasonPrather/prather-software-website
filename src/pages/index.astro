@@ -2,6 +2,7 @@
 import Base from '../layouts/Base.astro';
 import SectionHeading from '../components/SectionHeading.astro';
 import ProductCard from '../components/ProductCard.astro';
+import HeroBackdrop from '../components/HeroBackdrop.astro';
 import { services } from '../data';
 import { getCollection } from 'astro:content';
 const featuredProducts = [
@@ -36,20 +37,18 @@ const process = [
 ---
 
 <Base>
-  <section class="hero dark">
-    <div class="wrap hero-grid">
+  <section class="hero dark" aria-labelledby="hero-title">
+    <HeroBackdrop />
+    <div class="wrap hero-content">
       <div class="hero-copy">
         <p class="eyebrow">
           <span class="status-dot" aria-hidden="true"></span> INDEPENDENT
           ENGINEERING & PUBLISHING
         </p>
-        <h1>
+        <h1 id="hero-title">
           Built for business.
           <br />
-          <span>
-            Designed for
-            <br class="desktop-break" /> what’s next.
-          </span>
+          <span>Designed for what’s next.</span>
         </h1>
         <p class="hero-description muted">
           Purposeful software for your business. Original products for everyday
@@ -63,37 +62,6 @@ const process = [
           <a class="button outline" href="/products/">
             Explore our products <span aria-hidden="true">↗</span>
           </a>
-        </div>
-      </div>
-      <div class="engineering-art" aria-hidden="true">
-        <div class="art-coordinate">PS / SYSTEM_01</div>
-        <svg viewBox="0 0 360 360" fill="none">
-          <path
-            class="art-grid"
-            d="M0 60h360M0 120h360M0 180h360M0 240h360M0 300h360M60 0v360M120 0v360M180 0v360M240 0v360M300 0v360"
-          />
-          <path
-            class="art-frame"
-            d="M60 140V60h80M220 60h80v80M300 220v80h-80M140 300H60v-80"
-          />
-          <path
-            class="art-shadow"
-            d="M132 278V102h89l45 44v61l-45 44h-44v27h-45Z"
-          />
-          <path
-            class="art-letter"
-            d="M108 254V78h89l45 44v61l-45 44h-44v27h-45Zm45-72h26l18-18v-23l-18-18h-26v59Z"
-          />
-          <path class="art-guide" d="M0 254h360M108 0v360" />
-          <circle cx="108" cy="254" r="4" fill="#f2768c" />
-        </svg>
-        <div class="art-caption">
-          <span>
-            THOUGHTFULLY DESIGNED.
-            <br />
-            CAREFULLY ENGINEERED.
-          </span>
-          <span class="art-plus">+</span>
         </div>
       </div>
     </div>
@@ -234,32 +202,40 @@ const process = [
     margin-top: 1.5rem;
   }
   .hero {
-    padding: 78px 0 0;
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
   }
-  .hero-grid {
+  .hero-content {
+    position: relative;
+    z-index: 1;
     display: grid;
-    grid-template-columns: 1.55fr 1fr;
-    gap: 64px;
-    align-items: center;
+    place-items: center;
+    min-height: 680px;
+    padding-block: 100px 110px;
+    text-align: center;
   }
   .hero-copy {
-    padding: 12px 0 48px;
+    width: 100%;
+    max-width: 1120px;
   }
   .hero h1 {
-    font-size: clamp(3rem, 5.3vw, 5.1rem);
-    letter-spacing: -0.055em;
-    line-height: 1.06;
-    margin: 25px 0 25px;
+    font-size: clamp(3rem, 7.2vw, 6.25rem);
+    letter-spacing: -0.06em;
+    line-height: 1.05;
+    margin: 28px auto;
+    text-shadow: 0 2px 24px #001c1499;
   }
   .hero h1 > span {
     color: var(--accent);
   }
   .hero .eyebrow {
-    font-size: 10px;
     display: flex;
+    justify-content: center;
     align-items: center;
-    gap: 10px;
-    letter-spacing: 0.1em;
+    gap: 12px;
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
   }
   .status-dot {
     height: 6px;
@@ -268,81 +244,42 @@ const process = [
     background: var(--accent);
   }
   .hero-description {
-    max-width: 550px;
-    font-size: 1.03rem;
-    margin: 0 0 30px;
+    max-width: 650px;
+    font-size: 1.08rem;
+    margin: 0 auto 32px;
+    color: #e1ece5;
+    text-wrap: pretty;
   }
-  .engineering-art {
-    align-self: center;
-    position: relative;
-    border: 1px solid #414149;
-    aspect-ratio: 1;
-    max-width: 400px;
-    background: #19191e;
+  .hero .button-row {
+    justify-content: center;
   }
-  .engineering-art svg {
-    position: absolute;
-    inset: 24px;
-    width: calc(100% - 48px);
-    height: calc(100% - 48px);
+  .hero .button.outline {
+    background: #0b1b1bcc;
+    border-color: #91a99b;
   }
-  .art-grid {
-    stroke: #2a2a31;
-    stroke-width: 1;
-  }
-  .art-frame {
-    stroke: #898994;
-    stroke-width: 1;
-  }
-  .art-shadow {
-    fill: #551526;
-  }
-  .art-letter {
-    fill: #b01d38;
-    fill-rule: evenodd;
-  }
-  .art-guide {
-    stroke: #c34c64;
-    stroke-width: 1;
-    stroke-dasharray: 3 7;
-    opacity: 0.6;
-  }
-  .art-coordinate {
-    position: absolute;
-    left: 20px;
-    top: 15px;
-    font: 9px var(--mono);
-    letter-spacing: 0.12em;
-    color: #b7b7c2;
-  }
-  .art-caption {
-    position: absolute;
-    bottom: 17px;
-    left: 20px;
-    right: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: end;
-    font: 9px/1.6 var(--mono);
-    letter-spacing: 0.07em;
-    color: #b7b7c2;
-  }
-  .art-plus {
-    font-size: 24px;
-    color: #f2768c;
+  .hero .button.outline:hover {
+    background: var(--ink);
+    border-color: white;
   }
   .hero-strip {
+    position: relative;
+    z-index: 1;
     display: flex;
-    gap: 30px;
-    border-top: 1px solid #414149;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 20px 38px;
+    border-top: 1px solid #ffffff30;
     padding-block: 24px;
-    font: 9px/1.7 var(--mono);
+    font: 0.6rem/1.7 var(--mono);
     letter-spacing: 0.09em;
-    color: #bcbcc5;
+    color: #deebe3;
+    text-align: center;
   }
   .strip-end {
-    margin-left: auto;
-    color: #8e8e9b;
+    color: var(--muted-on-dark);
+  }
+  .hero:has(.hero-motion-toggle:not([hidden])) .hero-strip {
+    padding-bottom: 88px;
   }
   .business-card {
     position: relative;
@@ -357,7 +294,7 @@ const process = [
     position: absolute;
     right: 30px;
     top: 28px;
-    color: #77736d;
+    color: var(--muted);
     font: 32px var(--mono);
     font-weight: 400;
   }
@@ -389,11 +326,11 @@ const process = [
     display: flex;
     gap: 24px;
     padding: 28px 0;
-    border-top: 1px solid #c9c8c4;
+    border-top: 1px solid var(--line);
   }
   .capability-index {
     font: 11px var(--mono);
-    color: #a42139;
+    color: var(--brand);
     margin-top: 8px;
   }
   .capability h3 {
@@ -414,7 +351,7 @@ const process = [
     counter-reset: steps;
   }
   .process-grid li {
-    border-top: 1px solid #bcbab6;
+    border-top: 1px solid var(--line);
     padding-top: 23px;
   }
   .process-grid h3 {
@@ -447,20 +384,6 @@ const process = [
     margin-bottom: 0;
   }
   @media (max-width: 1080px) {
-    .hero-grid {
-      gap: 35px;
-      grid-template-columns: 1.5fr 1fr;
-    }
-    .hero h1 {
-      font-size: clamp(3rem, 5.7vw, 4.8rem);
-    }
-    .hero .eyebrow {
-      font-size: 9px;
-    }
-    .hero-strip {
-      gap: 20px;
-      font-size: 8px;
-    }
     .cta-inner {
       align-items: flex-start;
       flex-direction: column;
@@ -468,35 +391,16 @@ const process = [
     }
   }
   @media (max-width: 800px) {
-    .hero {
-      padding-top: 50px;
-    }
-    .hero-grid {
-      grid-template-columns: 1fr;
-    }
-    .hero-copy {
-      padding-bottom: 40px;
-    }
-    .engineering-art {
-      display: none;
+    .hero-content {
+      min-height: 620px;
+      padding-block: 76px;
     }
     .hero h1 {
-      font-size: clamp(3.25rem, 8.5vw, 5rem);
-      max-width: 700px;
-    }
-    .desktop-break {
-      display: none;
-    }
-    .hero-description {
-      max-width: 640px;
+      font-size: clamp(3rem, 8vw, 4.6rem);
     }
     .hero-strip {
-      flex-wrap: wrap;
       gap: 12px 24px;
-      font-size: 8px;
-    }
-    .strip-end {
-      margin-left: 0;
+      font-size: 0.54rem;
     }
     .process-grid {
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -513,8 +417,25 @@ const process = [
     }
   }
   @media (max-width: 750px) {
+    .hero-content {
+      min-height: 640px;
+      padding-block: 66px;
+    }
     .hero h1 {
-      font-size: clamp(3rem, 10vw, 4.5rem);
+      font-size: clamp(2.8rem, 10.5vw, 4.6rem);
+      margin-block: 26px;
+    }
+    .hero .eyebrow {
+      font-size: 0.58rem;
+      letter-spacing: 0.075em;
+      gap: 8px;
+    }
+    .hero-description {
+      font-size: 1rem;
+    }
+    .hero .button-row {
+      max-width: 380px;
+      margin-inline: auto;
     }
     .business-card {
       padding: 28px;
@@ -538,22 +459,16 @@ const process = [
     .capability-index {
       margin-top: 5px;
     }
-
     .process-grid {
       gap: 24px 20px;
     }
     .process-grid h3 {
       font-size: 1.2rem;
     }
-    .hero .eyebrow {
-      font-size: 8px;
-      letter-spacing: 0.03em;
-      gap: 8px;
-    }
   }
   @media (max-width: 380px) {
     .hero h1 {
-      font-size: 2.85rem;
+      font-size: 2.7rem;
     }
     .process-grid {
       grid-template-columns: 1fr;

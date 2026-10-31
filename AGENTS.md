@@ -31,7 +31,7 @@
 ## Accessibility and design
 
 - Preserve semantic HTML, accessible names, keyboard navigation, visible focus, no-JavaScript navigation, and reduced-motion behavior.
-- Maintain mobile/tablet/desktop layouts and crimson/black/white identity. Avoid unneeded effects and external font requests.
+- Maintain mobile/tablet/desktop layouts and owner-supplied logo and emerald green/near-black/white identity. Avoid unneeded effects and external font requests.
 - Metadata must include descriptions, canonical URLs, social sharing metadata, and truthful structured data. Keep sitemap entries restricted to published content.
 
 ## Parallel ownership

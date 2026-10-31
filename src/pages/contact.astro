@@ -194,7 +194,7 @@ const enabled =
     margin: 2rem 0;
   }
   .inquiry-guide div {
-    border-top: 1px solid #d8d8dc;
+    border-top: 1px solid var(--line);
     padding: 1.2rem 0;
   }
   .inquiry-guide dt {
@@ -203,13 +203,13 @@ const enabled =
   }
   .inquiry-guide dd {
     margin: 0;
-    color: #62636b;
+    color: var(--muted);
     line-height: 1.7;
   }
   .availability {
     padding: 1.2rem;
-    background: #f3eeef;
-    border-left: 3px solid #a91d36;
+    background: var(--brand-tint);
+    border-left: 3px solid var(--brand);
     line-height: 1.8;
     font-size: 0.9rem;
   }
@@ -225,7 +225,7 @@ const enabled =
     margin-bottom: 1.5rem;
   }
   .field-error {
-    color: #9d1831;
+    color: var(--error);
     font-size: 0.85rem;
     line-height: 1.5;
     display: block;
@@ -235,7 +235,7 @@ const enabled =
   }
   .field-hint {
     font-size: 0.82rem;
-    color: #62636b;
+    color: var(--muted);
     line-height: 1.7;
   }
   .field-hint a {
@@ -245,9 +245,9 @@ const enabled =
     display: none;
   }
   .form-status {
-    border-left: 3px solid #a91d36;
+    border-left: 3px solid var(--brand);
     padding: 0.8rem 1rem;
-    background: #f3eeef;
+    background: var(--brand-tint);
     line-height: 1.7;
   }
   .honey {
@@ -259,12 +259,12 @@ const enabled =
     white-space: nowrap;
   }
   .contact-form [aria-invalid='true'] {
-    border-color: #9d1831;
+    border-color: var(--error);
   }
   .contact-form input:disabled,
   .contact-form textarea:disabled,
   .contact-form select:disabled {
-    color: #5e6067;
+    color: var(--muted);
     background: #f1f1f0;
     opacity: 1;
   }

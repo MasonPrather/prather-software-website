@@ -1,8 +1,12 @@
+---
+import BrandLogo from './BrandLogo.astro';
+---
+
 <footer class="footer">
   <div class="wrap footer-grid">
     <div>
-      <a class="footer-brand" href="/">
-        PRATHER SOFTWARE<span aria-hidden="true">.</span>
+      <a class="footer-brand" href="/" aria-label="Prather Software home">
+        <BrandLogo />
       </a>
       <p>
         Practical engineering.
@@ -38,18 +42,14 @@
     gap: 36px;
   }
   .footer-brand {
-    color: white !important;
-    font-size: 15px;
-    font-weight: 750;
-    letter-spacing: 0.045em;
+    display: block;
+    width: min(280px, 100%);
+    padding: 12px;
+    background: white;
     text-decoration: none;
   }
-  .footer-brand span {
-    color: var(--accent);
-    font-size: 24px;
-  }
   .footer-grid > div > p {
-    color: #bcbcc5;
+    color: var(--muted-on-dark);
     font-size: 15px;
     line-height: 1.8;
     margin-top: 20px;
@@ -63,7 +63,7 @@
   .footer-links .footer-label {
     font: 11px var(--mono);
     letter-spacing: 0.13em;
-    color: #bcbcc5;
+    color: var(--muted-on-dark);
     margin: 0 0 7px;
   }
   .footer-links a {
@@ -74,11 +74,11 @@
     display: flex;
     gap: 24px;
     align-items: center;
-    border-top: 1px solid #3b3b42;
+    border-top: 1px solid var(--line-on-dark);
     margin-top: 58px;
     padding-top: 24px;
     font-size: 12px;
-    color: #bcbcc5;
+    color: var(--muted-on-dark);
   }
   .footer-bottom p {
     margin: 0;

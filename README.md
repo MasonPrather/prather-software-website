@@ -47,7 +47,15 @@ The site remains static-first. Plain CSS and small browser scripts keep the desi
 
 Research and personal portfolio entries have been removed at the owner’s request. The website focuses on client software services and independent games/apps. No clients, testimonials, staff, product releases, pricing, or partnerships have been invented. The owner-confirmed catalog lists Quest Theater under Software and Promenade, Rick Dangerman (& the Cuboids) Remastered, and Floor 13 under Games. All four products are unreleased. Quest Theater is marked Coming soon with a planned release week of November 2–8, 2026; the other three are In development. Prices and official store links remain unannounced on the site. Planned support is separate from current platforms, and Rick Dangerman’s controller/console plans remain conditional on success. Draft collection entries default to unpublished; published releases require an HTTPS store link, verified pricing (including Free), and platform metadata. Test products exist only in an automatically cleaned temporary directory.
 
-The geometric lettermark and social graphic are provisional identity assets, not a claim of finalized branding. Founder information and the NinjaDawg label relationship come from the supplied source.
+The owner-supplied Prather Software logo is used in navigation, the footer, and social sharing. The design uses emerald green, near-black, and white. Founder information and the NinjaDawg label relationship come from the supplied source.
+
+## Homepage background and branding
+
+The original logo is preserved at `public/brand/prather-software-logo.jpg`. `BrandLogo.astro` crops only its surrounding whitespace in CSS. Shared palette tokens live in `src/styles/global.css`; the favicon and 1200×630 social card use the same identity.
+
+The homepage centers large text over a blurred, darkened checkerboard placeholder. To replace it with animation, add a GIF under `public/images/` and set `animatedImage` in `src/data/hero.ts` to its root-relative URL (for example, `/images/homepage.gif`). Set `image` to a static still of that animation. `HeroBackdrop.astro` keeps the readability overlay and blur independent of the image; the text remains semantic HTML.
+
+The static image is served first and remains in use without JavaScript or when reduced motion is requested. An animation gets a keyboard-accessible pause/play button and falls back to the still if it fails to load. The checkerboard is intentionally static until a real animation is supplied. Keep future media local, appropriately compressed, and free of flashing effects.
 
 ## Contact and deployment gates
 

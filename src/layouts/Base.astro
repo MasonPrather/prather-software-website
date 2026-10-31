@@ -27,6 +27,7 @@ const organization = {
   url: Astro.site?.toString() ?? 'https://prathersoftware.com',
   description:
     'Custom software engineering and independent software and game publishing.',
+  logo: new URL('/brand/prather-software-logo.jpg', canonical).toString(),
 };
 ---
 
@@ -36,7 +37,7 @@ const organization = {
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
-    <meta name="theme-color" content="#131316" />
+    <meta name="theme-color" content="#0b1b1b" />
     {noindex && <meta name="robots" content="noindex, follow" />}
     <link rel="canonical" href={canonical} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />

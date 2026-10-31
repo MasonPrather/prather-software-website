@@ -1,16 +1,22 @@
 /* System fonts avoid third-party font requests. */
 :root {
   font-family: Inter, 'Helvetica Neue', Arial, sans-serif;
-  color: #202026;
-  background: #f8f7f4;
+  color: var(--ink);
+  background: var(--paper);
   font-synthesis: none;
-  --ink: #131316;
+  --ink: #0b1b1b;
   --white: #fff;
-  --paper: #f8f7f4;
-  --crimson: #b01d38;
-  --accent: #f2768c;
-  --muted: #62626b;
-  --line: #deddd9;
+  --paper: #f7f9f7;
+  --brand: #007a43;
+  --brand-hover: #005c34;
+  --brand-tint: #e8f4ed;
+  --logo-green: #008f51;
+  --error: #a32636;
+  --accent: #68e8a7;
+  --muted: #53635b;
+  --muted-on-dark: #bacdc4;
+  --line-on-dark: #345048;
+  --line: #d9e1da;
   --mono: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
 }
 * {
@@ -35,7 +41,7 @@ a {
   text-underline-offset: 4px;
 }
 a:hover {
-  text-decoration-color: var(--crimson);
+  text-decoration-color: var(--brand);
 }
 button,
 input,
@@ -55,7 +61,7 @@ input:focus-visible,
 textarea:focus-visible,
 select:focus-visible,
 summary:focus-visible {
-  outline: 3px solid #a42139;
+  outline: 3px solid var(--brand);
   outline-offset: 4px;
 }
 img,
@@ -101,7 +107,7 @@ h4 {
   font-size: 1.2rem;
 }
 ::selection {
-  background: #f6b7c3;
+  background: #ade6c5;
   color: var(--ink);
 }
 .wrap {
@@ -112,7 +118,7 @@ h4 {
   padding: 100px 0;
 }
 .eyebrow {
-  color: #a42139;
+  color: var(--brand);
   letter-spacing: 0.13em;
   font: 600 0.69rem/1.7 var(--mono);
   text-transform: uppercase;
@@ -140,14 +146,14 @@ h4 {
   margin-top: 0;
 }
 .card p {
-  color: #60606a;
+  color: var(--muted);
   line-height: 1.8;
 }
 .card p:last-child {
   margin-bottom: 0;
 }
 .card .eyebrow {
-  color: #a42139;
+  color: var(--brand);
   font-size: 0.66rem;
 }
 a.card {
@@ -158,7 +164,7 @@ a.card {
     transform 0.18s;
 }
 a.card:hover {
-  border-color: var(--crimson);
+  border-color: var(--brand);
   transform: translateY(-3px);
 }
 a.card:hover h3 {
@@ -180,8 +186,8 @@ a.card:hover h3 {
   justify-content: center;
   gap: 18px;
   min-height: 48px;
-  background: var(--crimson);
-  border: 1px solid var(--crimson);
+  background: var(--brand);
+  border: 1px solid var(--brand);
   color: white;
   padding: 15px 22px;
   font-weight: 600;
@@ -194,14 +200,14 @@ a.card:hover h3 {
     border-color 0.18s;
 }
 .button:hover {
-  background: #8c162d;
-  border-color: #8c162d;
+  background: var(--brand-hover);
+  border-color: var(--brand-hover);
   color: white;
   text-decoration: none;
 }
 .button.outline {
   background: transparent;
-  border-color: #76767f;
+  border-color: #70847a;
   color: inherit;
 }
 .button.outline:hover {
@@ -210,12 +216,12 @@ a.card:hover h3 {
 }
 .button.light {
   background: white;
-  color: #971a31;
+  color: var(--brand-hover);
   border-color: white;
 }
 .button.light:hover {
-  background: #f6e6e9;
-  border-color: #f6e6e9;
+  background: var(--brand-tint);
+  border-color: var(--brand-tint);
 }
 .button:disabled {
   opacity: 0.6;
@@ -234,56 +240,56 @@ a.card:hover h3 {
   color: var(--accent);
 }
 .dark .muted {
-  color: #bcbcc5;
+  color: var(--muted-on-dark);
 }
 .dark .card {
-  background: #1f1f25;
-  border-color: #44444c;
+  background: #122823;
+  border-color: var(--line-on-dark);
 }
 .dark .card p {
-  color: #bcbcc5;
+  color: var(--muted-on-dark);
 }
 .alt {
-  background: #eeede9;
+  background: #edf2ee;
 }
 .pagehero {
   background: var(--ink);
   color: white;
   padding: 82px 0 88px;
-  border-bottom: 1px solid #34343b;
+  border-bottom: 1px solid var(--line-on-dark);
 }
 .pagehero h1 {
   max-width: 1020px;
 }
 .pagehero p:not(.eyebrow) {
   max-width: 760px;
-  color: #c6c6ce;
+  color: var(--muted-on-dark);
   line-height: 1.8;
   font-size: 1.08rem;
   margin-bottom: 0;
 }
 .tag {
   display: inline-block;
-  border: 1px solid #d7d6d3;
+  border: 1px solid var(--line);
   padding: 5px 9px;
   margin: 4px 4px 4px 0;
   font: 11px/1.5 var(--mono);
-  color: #55555f;
-  background: #fafaf8;
+  color: var(--muted);
+  background: #f7faf8;
 }
 .cta {
-  background: var(--crimson);
+  background: var(--brand);
   color: white;
 }
 .cta .eyebrow {
-  color: #ffe0e7;
+  color: #e0f4e7;
 }
 .cta p:not(.eyebrow) {
-  color: #ffe0e7;
+  color: #e0f4e7;
 }
 .cta .button:not(.outline) {
   background: white;
-  color: #971a31;
+  color: var(--brand-hover);
   border-color: white;
 }
 .cta h2 {
@@ -294,7 +300,7 @@ a.card:hover h3 {
   color: white;
 }
 .footer a {
-  color: #c4c4cc;
+  color: var(--muted-on-dark);
 }
 .footer a:hover {
   color: white;
@@ -315,7 +321,7 @@ a.card:hover h3 {
   min-width: 0;
   min-height: 48px;
   padding: 13px 14px;
-  border: 1px solid #85858e;
+  border: 1px solid #73847b;
   border-radius: 1px;
   background: white;
   color: var(--ink);
@@ -325,16 +331,16 @@ a.card:hover h3 {
   resize: vertical;
 }
 .field :disabled {
-  background: #eeedea;
-  color: #686871;
+  background: #edf2ee;
+  color: var(--muted);
 }
 .field input[aria-invalid='true'],
 .field textarea[aria-invalid='true'],
 .field select[aria-invalid='true'] {
-  border: 2px solid #a42139;
+  border: 2px solid var(--error);
 }
 .field-error {
-  color: #a42139;
+  color: var(--error);
   font-size: 0.84rem;
   margin: 0;
 }
@@ -354,7 +360,7 @@ a.card:hover h3 {
   font-size: 1.4rem;
 }
 .prose a {
-  color: #a42139;
+  color: var(--brand);
 }
 .prose li {
   margin-bottom: 8px;
@@ -423,9 +429,8 @@ a.card:hover h3 {
 
 .dark :focus-visible,
 .pagehero :focus-visible,
-.site-header :focus-visible,
 .footer :focus-visible {
-  outline-color: #f2768c;
+  outline-color: var(--accent);
 }
 .cta :focus-visible {
   outline-color: white;
