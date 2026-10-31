@@ -31,7 +31,7 @@ After deployment, verify HTTPS and all sitemap pages, static assets, canonical/O
 
 ## Contact activation is a separate release
 
-`PUBLIC_CONTACT_ENABLED` stays false at build time. Production `CONTACT_ENABLED` and `CONTACT_DELIVERY_VERIFIED` stay false; sender and recipient remain empty, and no provider credentials are configured. The contact page explains availability, and direct POST requests return 503 without calling external services.
+`PUBLIC_CONTACT_ENABLED` stays false at build time. Production `CONTACT_ENABLED` and `CONTACT_DELIVERY_VERIFIED` stay false. The fixed candidate sender and recipient are `contact@prathersoftware.com`; Gmail authorization is not complete and no Gmail credentials are configured. The existing Turnstile secret is preserved. The contact page explains availability, and direct POST requests return 503 without calling external services.
 
 Follow [the staging guide](cloudflare-staging.md) to configure separate Turnstile widgets, secrets, sender verification, privacy review, and a real accepted/inbox-tested message before activation. Mocked tests do not prove email delivery. No paid provider account has been created.
 
@@ -85,3 +85,19 @@ On October 30, 2026, the owner selected the existing Google Workspace account as
 Node 24 verification passed with 88 unit tests, 155 browser tests, 14 built HTML pages, 304 local references, both local Worker configurations and packaging dry runs, and zero dependency audit vulnerabilities. Real Google authorization and real Turnstile/mail acceptance/replay checks have not occurred. The Mac was locked; the owner said they will unlock it later. No Google Cloud project, OAuth client, or credential has been created, and no Gmail credentials are present in the Workers. The implementation may be staged with collection disabled; the production contact gates and public form must remain off until the real verification completes. See [Google Workspace setup](google-workspace.md) for the exact next steps and callback URI.
 
 Gmail staging deployment completed: source `dabeecceaa1b788ce44ac03e08155150840c689f`, Worker version `bceaa153-8a13-4d2b-9ac8-cc6e464f66bf`. [CI passed](https://github.com/MasonPrather/prather-software-website/actions/runs/41151259118). Live staging parity/security/disabled-contact checks passed for 13 pages and seven assets. Production was not redeployed or activated; its previous source/version remains in service. The next required action is unlocking the Mac and completing the owner-reviewed Google project/client/consent flow, followed by real delivery and replay checks.
+
+## Owner-approved branding release
+
+The owner explicitly authorized deployment of the new logo, green palette, and centered hero on October 30, 2026. Deployed at `2026-10-31T01:49:26.751849Z` (October 30, approximately 9:49 PM America/New_York). This is the current production website release; the earlier entries above are historical.
+
+- Source: `e7a0a4c847fe3049779ff6b8b4a0403167e122ad` on `feature/milestone-2-website`.
+- Worker: `prather-software-website`, explicit Wrangler environment `production`, exact apex/www Custom Domains.
+- Version: `f3d1ff4b-4dbf-4e09-9b30-92fecaa7c10a`, serving 100% of traffic; deployment ID `b98f24df-5d72-4768-953c-ad51ad8ce97a`, tag `e7a0a4c`.
+- [Release CI](https://github.com/MasonPrather/prather-software-website/actions/runs/41153242529) passed for this exact source, including 88 unit tests, 180 browser tests, build/type checks, local runtimes, packaging dry runs, and a zero-vulnerability advisory audit. A fresh static build explicitly set `PUBLIC_CONTACT_ENABLED=false`; production packaging passed before upload.
+- Live `npm run test:production` passed: all 13 public pages and nine non-HTML assets match the release build byte-for-byte. HTTPS/www redirects preserve path/query; indexing, canonical metadata, security headers, branded 404, and disabled contact responses pass.
+- Live `npm run test:production:browser` passed in Chromium at 375/768/1440 px. Additional checks verified both original JPEG logos, centered hero text, blurred checkerboard, green palette, and static reduced-motion behavior at each width. Navigation and the selected automated WCAG rules passed; no browser errors or injected analytics beacon were detected.
+- Both remote server gates remain false, the public form remains disabled, the Turnstile secret remains present, and Gmail secrets remain absent. The prepared Gmail implementation is now deployed but cannot collect or send inquiries until the separate verified activation.
+- Google MX/SPF/DKIM/site-verification and privacy DNS records retain their exact IDs, contents, and modification timestamps. The separate privacy Worker's metadata/custom domain are unchanged. Its redirect and 200 response still work; SHA-256 remains `39f28d3ba5f389520791143ecffffbd557beb639ac9e47bf5bdcd850392ea4a6`.
+- Staging remains on its prior disabled Gmail release. No production email activation, paid service purchase, unrelated DNS change, or PR merge occurred.
+
+The homepage checkerboard remains a deliberate static placeholder. A future GIF and static still can be configured through `src/data/hero.ts` with pause/play and reduced-motion support. Manual assistive technology, physical-device, and actual Safari coverage remain unverified.
