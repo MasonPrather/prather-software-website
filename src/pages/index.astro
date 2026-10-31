@@ -1,0 +1,477 @@
+---
+import Base from '../layouts/Base.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import ProductCard from '../components/ProductCard.astro';
+import HeroBackdrop from '../components/HeroBackdrop.astro';
+import { services } from '../data';
+import { getCollection } from 'astro:content';
+const featuredProducts = [
+  ...(
+    await getCollection(
+      'software',
+      ({ data }) => data.published && data.featured,
+    )
+  ).map((entry) => ({ entry, category: 'software' as const })),
+  ...(
+    await getCollection('games', ({ data }) => data.published && data.featured)
+  ).map((entry) => ({ entry, category: 'games' as const })),
+].sort((a, b) => a.entry.data.order - b.entry.data.order);
+const process = [
+  [
+    'Understand the problem',
+    'Start with your goals, the people using the software, and the constraints that matter.',
+  ],
+  [
+    'Design the right system',
+    'Map the architecture, agree on priorities, and make the path to delivery clear.',
+  ],
+  [
+    'Build. Test. Refine.',
+    'Develop in focused increments, validate the details, and keep you involved.',
+  ],
+  [
+    'Deliver and evolve',
+    'Prepare for deployment, document the system, and plan for what comes next.',
+  ],
+];
+---
+
+<Base>
+  <section class="hero dark" aria-labelledby="hero-title">
+    <HeroBackdrop />
+    <div class="wrap hero-content">
+      <div class="hero-copy">
+        <p class="eyebrow">
+          <span class="status-dot" aria-hidden="true"></span> INDEPENDENT
+          ENGINEERING & PUBLISHING
+        </p>
+        <h1 id="hero-title">
+          Built for business.
+          <br />
+          <span>Designed for what’s next.</span>
+        </h1>
+        <p class="hero-description muted">
+          Purposeful software for your business. Original products for everyday
+          life. One independent engineering company, built to bring both to
+          life.
+        </p>
+        <div class="button-row">
+          <a class="button" href="/contact/">
+            Discuss your project <span aria-hidden="true">↗</span>
+          </a>
+          <a class="button outline" href="/products/">
+            Explore our products <span aria-hidden="true">↗</span>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="wrap hero-strip">
+      <span>01 / CLIENT SOFTWARE SOLUTIONS</span>
+      <span>02 / INDEPENDENT PUBLISHING</span>
+      <span class="strip-end">IDEA → ENGINEERING → IMPACT</span>
+    </div>
+  </section>
+  <section class="section">
+    <div class="wrap">
+      <SectionHeading
+        eyebrow="01 / ONE COMPANY. TWO DIRECTIONS."
+        title="The right software changes what’s possible."
+        description="We build custom systems for businesses and develop original software and games. Both start with a real problem, a clear purpose, and careful engineering."
+      />
+      <div class="grid business-grid">
+        <a class="card business-card" href="/services/">
+          <span class="business-number" aria-hidden="true">
+            01
+          </span>
+          <p class="eyebrow">FOR YOUR BUSINESS</p>
+          <h3>
+            Client software solutions <span aria-hidden="true">↗</span>
+          </h3>
+          <p>
+            Applications, infrastructure, automation, and specialized
+            engineering shaped around how your business works.
+          </p>
+          <span class="card-link">
+            Explore our services <span aria-hidden="true">↗</span>
+          </span>
+        </a>
+        <a class="card business-card" href="/products/">
+          <span class="business-number" aria-hidden="true">
+            02
+          </span>
+          <p class="eyebrow">FROM OUR STUDIO</p>
+          <h3>
+            Independent publishing <span aria-hidden="true">↗</span>
+          </h3>
+          <p>
+            Original applications, useful utilities, and games developed under
+            Prather Software and NinjaDawg Studios.
+          </p>
+          <span class="card-link">
+            Discover our products <span aria-hidden="true">↗</span>
+          </span>
+        </a>
+      </div>
+    </div>
+  </section>
+  <section class="section alt">
+    <div class="wrap">
+      <div class="heading-row">
+        <SectionHeading
+          eyebrow="02 / ENGINEERING CAPABILITIES"
+          title="From interface to infrastructure."
+        />
+        <a class="text-link" href="/services/">
+          All services <span aria-hidden="true">↗</span>
+        </a>
+      </div>
+      <div class="grid capability-grid">
+        {services.map(([title, description], index) => (
+          <article class="capability">
+            <span class="capability-index" aria-hidden="true">
+              0{index + 1}
+            </span>
+            <div>
+              <h3>{title}</h3>
+              <p class="muted">{description}</p>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+  <section class="section dark publishing-section">
+    <div class="wrap">
+      <SectionHeading
+        eyebrow="03 / INDEPENDENT PRODUCTS"
+        title="Built from our own curiosity."
+        description="From theater-style viewing on Quest to mobile party games, standalone PC games, and VR suspense. Explore our original software and games."
+      />
+      <div class="grid">
+        {featuredProducts.map(({ entry, category }) => (
+          <ProductCard entry={entry} category={category} />
+        ))}
+      </div>
+      <div class="catalog-links">
+        <a class="text-link" href="/products/software/">
+          Explore software <span aria-hidden="true">↗</span>
+        </a>
+        <a class="text-link" href="/products/games/">
+          Explore games <span aria-hidden="true">↗</span>
+        </a>
+      </div>
+    </div>
+  </section>
+  <section class="section">
+    <div class="wrap">
+      <SectionHeading
+        eyebrow="04 / HOW WE WORK"
+        title="A clear path from idea to delivery."
+      />
+      <ol class="process-grid" role="list">
+        {process.map(([title, description], index) => (
+          <li>
+            <span class="eyebrow" aria-hidden="true">
+              0{index + 1} /
+            </span>
+            <h3>{title}</h3>
+            <p class="muted">{description}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+  <section class="section cta">
+    <div class="wrap cta-inner">
+      <div>
+        <p class="eyebrow">LET’S BUILD SOMETHING USEFUL</p>
+        <h2>Your next software challenge starts with a conversation.</h2>
+        <p>Tell us what you have in mind. We’ll help define the next step.</p>
+      </div>
+      <a class="button light" href="/contact/">
+        Start a project inquiry <span aria-hidden="true">↗</span>
+      </a>
+    </div>
+  </section>
+</Base>
+<style>
+  .catalog-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 2rem;
+    margin-top: 1.5rem;
+  }
+  .hero {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+  }
+  .hero-content {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    min-height: 680px;
+    padding-block: 100px 110px;
+    text-align: center;
+  }
+  .hero-copy {
+    width: 100%;
+    max-width: 1120px;
+  }
+  .hero h1 {
+    font-size: clamp(3rem, 7.2vw, 6.25rem);
+    letter-spacing: -0.06em;
+    line-height: 1.05;
+    margin: 28px auto;
+    text-shadow: 0 2px 24px #001c1499;
+  }
+  .hero h1 > span {
+    color: var(--accent);
+  }
+  .hero .eyebrow {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
+  }
+  .status-dot {
+    height: 6px;
+    width: 6px;
+    flex-shrink: 0;
+    background: var(--accent);
+  }
+  .hero-description {
+    max-width: 650px;
+    font-size: 1.08rem;
+    margin: 0 auto 32px;
+    color: #e1ece5;
+    text-wrap: pretty;
+  }
+  .hero .button-row {
+    justify-content: center;
+  }
+  .hero .button.outline {
+    background: #0b1b1bcc;
+    border-color: #91a99b;
+  }
+  .hero .button.outline:hover {
+    background: var(--ink);
+    border-color: white;
+  }
+  .hero-strip {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 20px 38px;
+    border-top: 1px solid #ffffff30;
+    padding-block: 24px;
+    font: 0.6rem/1.7 var(--mono);
+    letter-spacing: 0.09em;
+    color: #deebe3;
+    text-align: center;
+  }
+  .strip-end {
+    color: var(--muted-on-dark);
+  }
+  .hero:has(.hero-motion-toggle:not([hidden])) .hero-strip {
+    padding-bottom: 88px;
+  }
+  .business-card {
+    position: relative;
+    padding: 38px;
+  }
+  .business-card h3 {
+    font-size: 1.8rem;
+    max-width: 360px;
+    margin-top: 25px;
+  }
+  .business-number {
+    position: absolute;
+    right: 30px;
+    top: 28px;
+    color: var(--muted);
+    font: 32px var(--mono);
+    font-weight: 400;
+  }
+  .business-card p:not(.eyebrow) {
+    max-width: 430px;
+  }
+  .card-link {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-top: 28px;
+  }
+  .heading-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 30px;
+  }
+  .heading-row > .text-link {
+    flex-shrink: 0;
+    margin-top: 26px;
+  }
+  .capability-grid {
+    gap: 0 56px;
+  }
+  .capability {
+    display: flex;
+    gap: 24px;
+    padding: 28px 0;
+    border-top: 1px solid var(--line);
+  }
+  .capability-index {
+    font: 11px var(--mono);
+    color: var(--brand);
+    margin-top: 8px;
+  }
+  .capability h3 {
+    margin: 0 0 14px;
+    font-size: 1.4rem;
+  }
+  .capability p {
+    font-size: 0.95rem;
+    margin: 0;
+  }
+  .process-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    gap: 30px;
+    counter-reset: steps;
+  }
+  .process-grid li {
+    border-top: 1px solid var(--line);
+    padding-top: 23px;
+  }
+  .process-grid h3 {
+    font-size: 1.35rem;
+    line-height: 1.2;
+    max-width: 210px;
+    margin: 22px 0 14px;
+  }
+  .process-grid p {
+    font-size: 0.88rem;
+    margin: 0;
+  }
+  .cta-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 50px;
+  }
+  .cta-inner > div {
+    max-width: 740px;
+  }
+  .cta h2 {
+    font-size: clamp(2.1rem, 3.5vw, 3.2rem);
+    margin-bottom: 20px;
+  }
+  .cta .button {
+    flex-shrink: 0;
+  }
+  .cta p:last-child {
+    margin-bottom: 0;
+  }
+  @media (max-width: 1080px) {
+    .cta-inner {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 28px;
+    }
+  }
+  @media (max-width: 800px) {
+    .hero-content {
+      min-height: 620px;
+      padding-block: 76px;
+    }
+    .hero h1 {
+      font-size: clamp(3rem, 8vw, 4.6rem);
+    }
+    .hero-strip {
+      gap: 12px 24px;
+      font-size: 0.54rem;
+    }
+    .process-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 30px;
+    }
+    .heading-row {
+      display: block;
+    }
+    .heading-row > .text-link {
+      margin: 0 0 24px;
+    }
+    .heading-row .section-heading {
+      margin-bottom: 12px;
+    }
+  }
+  @media (max-width: 750px) {
+    .hero-content {
+      min-height: 640px;
+      padding-block: 66px;
+    }
+    .hero h1 {
+      font-size: clamp(2.8rem, 10.5vw, 4.6rem);
+      margin-block: 26px;
+    }
+    .hero .eyebrow {
+      font-size: 0.58rem;
+      letter-spacing: 0.075em;
+      gap: 8px;
+    }
+    .hero-description {
+      font-size: 1rem;
+    }
+    .hero .button-row {
+      max-width: 380px;
+      margin-inline: auto;
+    }
+    .business-card {
+      padding: 28px;
+    }
+    .business-card h3 {
+      font-size: 1.65rem;
+      max-width: 290px;
+    }
+    .business-number {
+      right: 24px;
+      top: 22px;
+      font-size: 25px;
+    }
+    .capability-grid {
+      gap: 0;
+    }
+    .capability {
+      padding: 25px 0;
+      gap: 18px;
+    }
+    .capability-index {
+      margin-top: 5px;
+    }
+    .process-grid {
+      gap: 24px 20px;
+    }
+    .process-grid h3 {
+      font-size: 1.2rem;
+    }
+  }
+  @media (max-width: 380px) {
+    .hero h1 {
+      font-size: 2.7rem;
+    }
+    .process-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

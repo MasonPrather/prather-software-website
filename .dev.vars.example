@@ -1,0 +1,11 @@
+# Copy to ignored .dev.vars for local Worker settings. Never commit real secrets.
+CONTACT_ENABLED=false
+CONTACT_DELIVERY_VERIFIED=false
+ALLOWED_ORIGIN=http://localhost:8787
+TURNSTILE_HOSTNAME=localhost
+CONTACT_FROM=
+CONTACT_TO=
+TURNSTILE_SECRET=
+GMAIL_CLIENT_ID=
+GMAIL_CLIENT_SECRET=
+GMAIL_REFRESH_TOKEN=

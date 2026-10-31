@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "types": [],
+    "skipLibCheck": true,
+    "noEmit": true
+  },
+  "include": [
+    "worker/**/*.ts",
+    "src/lib/contact.ts",
+    "worker-configuration.d.ts"
+  ],
+  "exclude": ["node_modules", "dist"]
+}

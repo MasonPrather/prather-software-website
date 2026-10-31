@@ -1,0 +1,41 @@
+name: Website quality
+on:
+  push:
+    branches: [main, feature/milestone-2-website]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: quality-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm audit --audit-level=high
+      - run: npx playwright install --with-deps chromium firefox webkit
+      - run: npm run format:check
+      - run: npm run check
+      - run: npm run build
+      - run: npm test
+      - run: npm run test:e2e
+      - run: npm run worker:dry-run
+      - uses: actions/upload-artifact@v7
+        if: failure()
+        with:
+          name: playwright-report
+          path: |
+            playwright-report/
+            test-results/
+          retention-days: 7

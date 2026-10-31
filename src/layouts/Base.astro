@@ -1,0 +1,78 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+interface Props {
+  title?: string;
+  description?: string;
+  noindex?: boolean;
+}
+const {
+  title = 'Prather Software | Engineering & Independent Publishing',
+  description = 'Founder-led custom software engineering, web applications, backend systems, automation, and original software and games from Prather Software LLC.',
+  noindex = false,
+} = Astro.props;
+const canonical = new URL(
+  Astro.url.pathname,
+  Astro.site ?? 'https://prathersoftware.com',
+);
+const socialImage = new URL(
+  '/social-card.png',
+  Astro.site ?? 'https://prathersoftware.com',
+);
+const organization = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: 'Prather Software LLC',
+  url: Astro.site?.toString() ?? 'https://prathersoftware.com',
+  description:
+    'Custom software engineering and independent software and game publishing.',
+  logo: new URL('/brand/prather-software-logo.jpg', canonical).toString(),
+};
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#0b1b1b" />
+    {noindex && <meta name="robots" content="noindex, follow" />}
+    <link rel="canonical" href={canonical} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="sitemap" href="/sitemap.xml" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_US" />
+    <meta property="og:site_name" content="Prather Software" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={socialImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="Prather Software — custom engineering and independent publishing"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={socialImage} />
+    <script
+      type="application/ld+json"
+      set:html={JSON.stringify(organization)}
+    />
+    <title>{title}</title>
+  </head>
+  <body>
+    <a class="skip" href="#main">
+      Skip to content
+    </a>
+    <Header />
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

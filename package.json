@@ -1,0 +1,45 @@
+{
+  "name": "prather-software",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check && tsc -p tsconfig.worker.json --noEmit",
+    "test": "npm run test:unit && npm run test:links && npm run test:content && npm run test:secrets && npm run test:runtime",
+    "test:unit": "tsx --test tests/unit/*.test.ts",
+    "test:links": "node scripts/check-links.mjs",
+    "test:content": "node scripts/check-content.mjs",
+    "test:e2e": "playwright test",
+    "worker:dev": "wrangler dev --local",
+    "worker:types": "wrangler types --strict-vars=false",
+    "worker:dry-run": "wrangler deploy --dry-run --env=\"\" && wrangler deploy --dry-run --env production",
+    "verify": "npm run format:check && npm run check && npm run build && npm test && npm run test:e2e && npm run worker:dry-run",
+    "test:secrets": "node scripts/check-secrets.mjs",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test:runtime": "node scripts/check-worker.mjs && node scripts/check-worker.mjs --production",
+    "test:production": "node scripts/check-production.mjs",
+    "test:production:browser": "node scripts/check-production-browser.mjs",
+    "gmail:authorize": "node scripts/gmail-authorize.mjs"
+  },
+  "dependencies": {
+    "astro": "^7.4.4"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.12",
+    "@axe-core/playwright": "^4.14.0",
+    "@playwright/test": "^1.64.1",
+    "@types/node": "^26.6.6",
+    "prettier": "^3.9.10",
+    "prettier-plugin-astro": "^1.1.2",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3",
+    "wrangler": "^4.156.0"
+  },
+  "description": "Prather Software LLC engineering services and independent publishing website",
+  "engines": {
+    "node": ">=24.0.0"
+  }
+}
