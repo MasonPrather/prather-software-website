@@ -88,7 +88,7 @@ Gmail staging deployment completed: source `dabeecceaa1b788ce44ac03e08155150840c
 
 ## Owner-approved branding release
 
-The owner explicitly authorized deployment of the new logo, green palette, and centered hero on October 30, 2026. Deployed at `2026-10-31T01:49:26.751849Z` (October 30, approximately 9:49 PM America/New_York). This is the current production website release; the earlier entries above are historical.
+The owner explicitly authorized deployment of the new logo, green palette, and centered hero on October 30, 2026. Deployed at `2026-10-31T01:49:26.751849Z` (October 30, approximately 9:49 PM America/New_York). This was the production branding release; the subsequent diamond-icon release below is current.
 
 - Source: `e7a0a4c847fe3049779ff6b8b4a0403167e122ad` on `feature/milestone-2-website`.
 - Worker: `prather-software-website`, explicit Wrangler environment `production`, exact apex/www Custom Domains.
@@ -101,3 +101,17 @@ The owner explicitly authorized deployment of the new logo, green palette, and c
 - Staging remains on its prior disabled Gmail release. No production email activation, paid service purchase, unrelated DNS change, or PR merge occurred.
 
 The homepage checkerboard remains a deliberate static placeholder. A future GIF and static still can be configured through `src/data/hero.ts` with pause/play and reduced-motion support. Manual assistive technology, physical-device, and actual Safari coverage remain unverified.
+
+## Supplied diamond icon release
+
+On November 3, 2026, the owner requested contact activation and supplied the exact diamond-P artwork for the site icon. The icon is now live in the header beside the wordmark and in fresh browser/favicon/Apple-touch paths. Its original PNG is preserved unchanged (SHA-256 `69643ae4dfdeef74408131ee7cb02e2cb07760e79e323b1df6692cc9313f5272`); small rendered variants avoid loading the full original in navigation.
+
+- Deployed source: `20aa7994beffdaba6b0cc4c752ba8738d6b13247`.
+- Production Worker/version: `prather-software-website` / `3bf9ee4d-e56b-4d41-83d8-0e71d23129b2`, tag `20aa799`, serving 100% of apex/www traffic.
+- Deployment ID: `75317f12-af68-4e7b-938c-971c4a423c28`; created `2026-11-03T22:04:10.376787Z` (November 3, approximately 5:04 PM America/New_York).
+- Full local Node 24 validation passed: formatting, build/types, 88 unit tests, 180 browser tests, 376 references, publication/secret-pattern/runtime checks, both packaging dry runs, and zero dependency vulnerabilities. [PR CI](https://github.com/MasonPrather/prather-software-website/actions/runs/41725745566) and [push CI](https://github.com/MasonPrather/prather-software-website/actions/runs/41725736620) passed before deployment.
+- Live HTTP parity passed for all 13 public pages and 13 assets, plus canonical redirects, indexing/security, branded 404, and contact-disabled checks. Live Chromium checks passed at 375/768/1440px, including the supplied diamond thumbnail, SVG/PNG favicons, touch-icon links, navigation, selected accessibility rules, and absence of browser errors or analytics injection.
+- Privacy Worker metadata, exact custom domain, and five scoped Google mail/verification and privacy DNS records are identical before/after. Privacy still redirects to `/quest-theater/`, returns 200, and retains SHA-256 `39f28d3ba5f389520791143ecffffbd557beb639ac9e47bf5bdcd850392ea4a6`.
+- Both contact gates and public form remain off. The Turnstile secret is preserved; Gmail secrets are absent. The Google organization-owned project and Internal app configuration are prepared, but client-creation approval, send-only consent, protected credentials, and actual staged delivery/replay tests remain pending. The Mac locked again at the prepared client form. No live delivery or contact activation is claimed.
+
+The new optional `--contact-enabled` production-check modes are for a future verified activation. They do not send inquiries and cannot replace actual acceptance/inbox/replay evidence. The PR remains unmerged.
