@@ -53,6 +53,8 @@ The owner-supplied Prather Software logo is used in navigation, the footer, and 
 
 The original logo is preserved at `public/brand/prather-software-logo.jpg`. `BrandLogo.astro` crops only its surrounding whitespace in CSS. Shared palette tokens live in `src/styles/global.css`; the favicon and 1200×630 social card use the same identity.
 
+The owner-supplied diamond-P artwork is preserved unchanged at `public/brand/prather-diamond-icon.png`. `BrandIcon.astro` displays an optimized thumbnail beside the navigation wordmark. `Base.astro` links to the corresponding SVG favicon, 32px PNG fallback, and 180px touch icon under `public/brand/prather-diamond-icon*`; these new paths prevent browsers from reusing the previous favicon cache. The icon variants crop only surrounding whitespace and reuse the supplied artwork.
+
 The homepage centers large text over a blurred, darkened checkerboard placeholder. To replace it with animation, add a GIF under `public/images/` and set `animatedImage` in `src/data/hero.ts` to its root-relative URL (for example, `/images/homepage.gif`). Set `image` to a static still of that animation. `HeroBackdrop.astro` keeps the readability overlay and blur independent of the image; the text remains semantic HTML.
 
 The static image is served first and remains in use without JavaScript or when reduced motion is requested. An animation gets a keyboard-accessible pause/play button and falls back to the still if it fails to load. The checkerboard is intentionally static until a real animation is supplied. Keep future media local, appropriately compressed, and free of flashing effects.

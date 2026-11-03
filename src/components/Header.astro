@@ -1,5 +1,6 @@
 ---
 import BrandLogo from './BrandLogo.astro';
+import BrandIcon from './BrandIcon.astro';
 const pathname = Astro.url.pathname.replace(/\/$/, '') || '/';
 const current = (href: string) =>
   pathname === href ? ('page' as const) : undefined;
@@ -8,7 +9,10 @@ const current = (href: string) =>
 <header class="site-header">
   <div class="wrap header-inner">
     <a class="brand" href="/" aria-label="Prather Software home">
-      <BrandLogo />
+      <BrandIcon />
+      <span class="brand-wordmark">
+        <BrandLogo />
+      </span>
     </a>
     <button
       class="menu-toggle"
@@ -180,7 +184,12 @@ const current = (href: string) =>
     align-items: center;
     text-decoration: none;
     flex-shrink: 0;
-    width: 270px;
+    width: 326px;
+    gap: 12px;
+  }
+  .brand-wordmark {
+    flex: 1;
+    min-width: 0;
   }
   nav {
     display: flex;
@@ -290,6 +299,7 @@ const current = (href: string) =>
     }
     .brand {
       width: 240px;
+      gap: 10px;
     }
     nav {
       width: 100%;
@@ -340,6 +350,7 @@ const current = (href: string) =>
   @media (max-width: 380px) {
     .brand {
       width: 194px;
+      gap: 8px;
     }
     .menu-toggle {
       padding: 10px;

@@ -38,7 +38,7 @@ test('the supplied logo loads and the centered headline overlays the blurred pla
   page,
 }) => {
   await page.goto('/');
-  const logos = page.locator('header img, footer img');
+  const logos = page.locator('.brand-logo img');
   await expect(logos).toHaveCount(2);
   for (const logo of await logos.all()) {
     await expect(logo).toHaveAttribute(
@@ -54,6 +54,16 @@ test('the supplied logo loads and the centered headline overlays the blurred pla
       .locator('header')
       .getByRole('link', { name: 'Prather Software home', exact: true }),
   ).toBeVisible();
+  const navigationIcon = page.locator('header .brand-icon');
+  await expect(navigationIcon).toHaveAttribute('alt', '');
+  await expect(navigationIcon).toHaveAttribute('aria-hidden', 'true');
+  await expect(navigationIcon).toHaveAttribute(
+    'src',
+    '/brand/prather-diamond-icon-180.png',
+  );
+  expect(
+    await navigationIcon.evaluate((el: HTMLImageElement) => el.naturalWidth),
+  ).toBe(180);
   const headline = page.locator('h1');
   const hero = page.locator('.hero');
   await expect(headline).toHaveCSS('text-align', 'center');

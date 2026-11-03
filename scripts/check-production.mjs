@@ -4,7 +4,18 @@ import { readFile, readdir, stat } from 'node:fs/promises';
 import path from 'node:path';
 
 // Run manually after an authorized deployment, never in local/PR verification.
-// The one empty POST below verifies that contact collection remains disabled.
+// Default mode sends one empty POST to verify collection remains disabled.
+// --contact-enabled verifies the active public UI without sending any inquiry.
+const args = process.argv.slice(2);
+assert.ok(
+  args.length === 0 || (args.length === 1 && args[0] === '--contact-enabled'),
+  'Usage: npm run test:production -- [--contact-enabled]',
+);
+const contactEnabled = args.includes('--contact-enabled');
+const productionSiteKey = contactEnabled
+  ? JSON.parse(await readFile('ops/turnstile-widgets.json', 'utf8')).production
+      .sitekey
+  : undefined;
 const origin = 'https://prathersoftware.com';
 const digest = (body) => createHash('sha256').update(body).digest('hex');
 const get = (url, init = {}) =>
@@ -47,8 +58,21 @@ for (const url of routes) {
     html.includes(`href="${url.href}"`),
     `Missing canonical URL: ${url.href}`,
   );
-  if (url.pathname === '/contact/')
-    assert.match(html, /<fieldset[^>]*disabled/);
+  if (url.pathname === '/contact/') {
+    const fieldset = html.match(/<fieldset\b[^>]*>/)?.[0];
+    assert.ok(fieldset, 'Missing contact fieldset');
+    assert.equal(
+      /\sdisabled(?:[=\s>])/.test(fieldset),
+      !contactEnabled,
+      'Unexpected contact availability',
+    );
+    assert.ok(html.includes(`data-enabled="${contactEnabled}"`));
+    if (contactEnabled) {
+      assert.ok(productionSiteKey, 'Missing recorded production sitekey');
+      assert.ok(html.includes(`data-sitekey="${productionSiteKey}"`));
+      assert.ok(html.includes('id="turnstile-widget"'));
+    }
+  }
 }
 let assets = 0;
 for (const file of await readdir('dist', { recursive: true })) {
@@ -82,15 +106,17 @@ assert.equal(missing.headers.get('X-Robots-Tag'), 'noindex, nofollow');
 assert.match(await missing.text(), /Let's get you back on track/);
 const method = await get(origin + '/api/contact');
 assert.equal(method.status, 405);
-const unavailable = await get(origin + '/api/contact', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json', Origin: origin },
-  body: '{}',
-});
-assert.equal(unavailable.status, 503);
-assert.equal(unavailable.headers.get('Cache-Control'), 'no-store');
-assert.equal(unavailable.headers.get('X-Robots-Tag'), 'noindex, nofollow');
-assert.equal((await unavailable.json()).ok, false);
+if (!contactEnabled) {
+  const unavailable = await get(origin + '/api/contact', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Origin: origin },
+    body: '{}',
+  });
+  assert.equal(unavailable.status, 503);
+  assert.equal(unavailable.headers.get('Cache-Control'), 'no-store');
+  assert.equal(unavailable.headers.get('X-Robots-Tag'), 'noindex, nofollow');
+  assert.equal((await unavailable.json()).ok, false);
+}
 const privacy = await fetch('https://privacy.prathersoftware.com/', {
   signal: AbortSignal.timeout(20_000),
 });
@@ -102,5 +128,5 @@ console.log(
   }),
 );
 console.log(
-  `Verified ${routes.length} live pages and ${assets} assets against this build, HTTPS/www redirects, indexing/security headers, branded 404, disabled contact, and existing privacy availability.`,
+  `Verified ${routes.length} live pages and ${assets} assets against this build, HTTPS/www redirects, indexing/security headers, branded 404, ${contactEnabled ? 'enabled contact UI (no inquiry sent)' : 'disabled contact'}, and existing privacy availability.`,
 );
