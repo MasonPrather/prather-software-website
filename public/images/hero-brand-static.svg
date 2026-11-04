@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000" fill="none">
+  <title>Original Prather Software geometric signal artwork</title>
+  <rect width="1600" height="1000" fill="#0b1b1b"/>
+  <g stroke="#32634d" stroke-opacity=".35">
+    <path d="M0 180H1600M0 380H1600M0 580H1600M0 780H1600M0 980H1600"/>
+    <path d="M180 0V1000M480 0V1000M780 0V1000M1080 0V1000M1380 0V1000"/>
+  </g>
+  <g stroke="#60c494" stroke-width="2">
+    <path stroke-opacity=".32" d="M-140 400 180 80 500 400 180 720Z"/>
+    <path stroke-opacity=".22" d="M-60 400 180 160 420 400 180 640Z"/>
+    <path stroke-opacity=".25" d="m1080 600 320-320 320 320-320 320Z"/>
+    <path stroke-opacity=".38" d="m1160 600 240-240 240 240-240 240Z"/>
+  </g>
+  <g stroke="#148b59" stroke-width="3" stroke-linecap="square">
+    <path stroke-opacity=".55" d="M0 700h260l160-160h760l160-160h260"/>
+    <path stroke-opacity=".4" d="M0 300h320l160 160h640l160 160h320"/>
+    <path stroke-opacity=".3" d="M180 0v160l240 240v200L180 840v160"/>
+    <path stroke-opacity=".45" d="M1400 0v240l-240 240v240l240 240v40"/>
+  </g>
+  <g stroke="#75dfac" stroke-width="4" stroke-linecap="square" opacity=".6">
+    <path d="M86 700h64M1306 380h64M312 300h32M1436 620h64"/>
+  </g>
+  <g fill="#5ac68f">
+    <path opacity=".65" d="m180 386 14 14-14 14-14-14ZM1400 586l14 14-14 14-14-14Z"/>
+    <path opacity=".35" d="m420 530 10 10-10 10-10-10ZM1180 530l10 10-10 10-10-10ZM480 450l10 10-10 10-10-10ZM1120 450l10 10-10 10-10-10Z"/>
+  </g>
+</svg>

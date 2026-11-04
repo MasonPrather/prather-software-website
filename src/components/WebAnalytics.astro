@@ -1,0 +1,47 @@
+---
+import analytics from '../../ops/web-analytics.json';
+
+const enabled = import.meta.env.PUBLIC_WEB_ANALYTICS_ENABLED === 'true';
+if (
+  enabled &&
+  (analytics.hostname !== 'prathersoftware.com' ||
+    !/^[a-f0-9]{32}$/.test(analytics.site_token) ||
+    analytics.auto_install !== false ||
+    analytics.mode !== 'manual' ||
+    analytics.script_url !==
+      'https://static.cloudflareinsights.com/beacon.min.js' ||
+    analytics.collection_origin !== 'https://cloudflareinsights.com' ||
+    analytics.respects_do_not_track !== true)
+) {
+  throw new Error(
+    'Web Analytics must use the recorded manual production site.',
+  );
+}
+---
+
+{enabled && <script
+  is:inline
+  data-prather-analytics-loader
+  data-site-token={analytics.site_token}
+>
+  (() => {
+    // Production assets can also be inspected on other hosts. Do not collect
+    // from previews, local development, staging, or the separate privacy site.
+    if (
+      window.location.origin !== 'https://prathersoftware.com' ||
+      navigator.doNotTrack === '1' ||
+      document.querySelector('script[data-prather-web-analytics]')
+    )
+      return;
+
+    // The site token is a public embed identifier, never an API credential.
+    const token = document.currentScript?.getAttribute('data-site-token');
+    if (!token || !/^[a-f0-9]{32}$/.test(token)) return;
+    const script = document.createElement('script');
+    script.src = 'https://static.cloudflareinsights.com/beacon.min.js';
+    script.defer = true;
+    script.setAttribute('data-prather-web-analytics', '');
+    script.setAttribute('data-cf-beacon', JSON.stringify({ token }));
+    document.head.append(script);
+  })();
+</script>}

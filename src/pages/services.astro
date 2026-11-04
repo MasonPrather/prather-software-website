@@ -1,0 +1,72 @@
+---
+import Base from '../layouts/Base.astro';
+import PageHero from '../components/PageHero.astro';
+import ContactCTA from '../components/ContactCTA.astro';
+import { serviceDetails } from '../data';
+---
+
+<Base
+  title="Software Engineering Services | Prather Software"
+  description="Website design, custom PC and mobile applications, SaaS, server support, AI integration, and ongoing service for contracted software implementations."
+>
+  <PageHero
+    eyebrow="Services / Client software solutions"
+    title="Good software starts with the right problem."
+    description="Custom engineering for the systems your business depends on. From a focused prototype to a complete application, the work begins with your goals and the constraints that matter."
+  />
+  <section class="section">
+    <div class="wrap">
+      <p class="eyebrow">Four engineering disciplines</p>
+      <h2>From interface to infrastructure.</h2>
+      <div class="grid">
+        {serviceDetails.map((service, index) => (
+          <article class="card">
+            <p class="eyebrow">0{index + 1} / Engineering</p>
+            <h3>{service.title}</h3>
+            <p>{service.description}</p>
+            <ul>
+              {service.capabilities.map((capability) => (
+                <li>{capability}</li>
+              ))}
+            </ul>
+            <p class="approach">{service.approach}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+  <section class="section alt">
+    <div class="wrap intro">
+      <p class="eyebrow">A clear starting point</p>
+      <h2>Define the work. Then build it well.</h2>
+      <p class="muted">
+        A useful first conversation covers the problem, the people who use the
+        system, existing technology, timing, and the decisions still to be made.
+        Scope and delivery expectations are agreed before implementation begins.
+      </p>
+      <h3>Support beyond implementation.</h3>
+      <p class="muted">
+        Ongoing technical service is available for contracted software
+        implementations. Support scope and server responsibilities are defined
+        with the implementation contract.
+      </p>
+      <a class="text-link" href="/contact/">
+        Discuss your software needs <span aria-hidden="true">↗</span>
+      </a>
+    </div>
+  </section>
+  <ContactCTA />
+</Base>
+<style>
+  ul {
+    padding-left: 1.25rem;
+    line-height: 1.8;
+  }
+  .approach {
+    border-top: 1px solid #dddde0;
+    padding-top: 1.25rem;
+  }
+  .intro {
+    max-width: 900px;
+  }
+</style>

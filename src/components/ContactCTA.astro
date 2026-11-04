@@ -1,0 +1,21 @@
+---
+interface Props {
+  title?: string;
+  description?: string;
+}
+const {
+  title = 'Have a software challenge?',
+  description = 'Tell us what you are building, where the complexity is, and what a useful result looks like.',
+} = Astro.props;
+---
+
+<section class="section cta">
+  <div class="wrap">
+    <p class="eyebrow">Start a conversation</p>
+    <h2>{title}</h2>
+    <p>{description}</p>
+    <a class="button light" href="/contact/">
+      Discuss your project <span aria-hidden="true">↗</span>
+    </a>
+  </div>
+</section>

@@ -1,0 +1,17 @@
+{
+  "account_id": "901d7b0a79a15aaa0f84fbca1bbb2ad5",
+  "binding": "MONITORING_STATE",
+  "purpose": "Operational incident category and timestamp only; no inquiry content or visitor data",
+  "staging": {
+    "worker": "prather-software-staging",
+    "namespace_id": "d5bf5f248de54349865abf73f508fa50",
+    "title": "prather-website-monitoring-staging"
+  },
+  "production": {
+    "worker": "prather-software-website",
+    "namespace_id": "9758844c87e646a48591e673ef40ae2f",
+    "title": "prather-website-monitoring-production"
+  },
+  "plan": "Workers KV Free allowances; no paid upgrade",
+  "documentation": "https://developers.cloudflare.com/kv/platform/pricing/"
+}
