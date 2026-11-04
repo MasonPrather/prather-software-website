@@ -84,6 +84,15 @@ try {
       response.writeHead(400).end('Request not accepted.');
       return;
     }
+    if (
+      url.pathname === '/start' &&
+      !url.search &&
+      !session.used &&
+      Date.now() < session.expiresAt
+    ) {
+      response.writeHead(303, { Location: session.url }).end();
+      return;
+    }
     if (url.pathname === '/complete' && received) {
       response
         .writeHead(200)
@@ -143,7 +152,7 @@ try {
     console.log(
       'Authorize only the Google Workspace mailbox that owns the approved sender address.',
     );
-    console.log(session.url);
+    console.log('Open http://127.0.0.1:8977/start in Safari to authorize.');
     await done;
     console.log(
       'Send-only Google authorization saved to the ignored .dev.vars.gmail file (mode 0600).',
