@@ -1,22 +1,13 @@
 import { inquiryCategories, validateContact } from '../src/lib/contact';
+import { isMailboxAddress, sendGmailInquiry } from './gmail';
 import {
-  gmailConfigured,
-  isMailboxAddress,
-  sendGmailInquiry,
-  type GmailEnvironment,
-} from './gmail';
+  contactAvailable,
+  handleHealth,
+  type HealthEnvironment,
+} from './health';
+import { updateContactIncident } from './monitoring-state';
 
-export type ContactEnvironment = Pick<
-  Env,
-  | 'CONTACT_ENABLED'
-  | 'CONTACT_DELIVERY_VERIFIED'
-  | 'ALLOWED_ORIGIN'
-  | 'TURNSTILE_HOSTNAME'
-  | 'CONTACT_FROM'
-  | 'CONTACT_TO'
-  | 'CONTACT_RATE_LIMITER'
-> &
-  GmailEnvironment & { TURNSTILE_SECRET?: string };
+export type ContactEnvironment = HealthEnvironment;
 const MAX_BODY_BYTES = 16_384;
 const REQUEST_TIMEOUT_MS = 10_000;
 function json(
@@ -35,11 +26,13 @@ function json(
     { status, headers },
   );
 }
-function verificationUnavailable(
+async function verificationUnavailable(
+  env: ContactEnvironment,
   stage: 'request' | 'response',
   reason: 'http' | 'exception' | 'timeout',
   status?: number,
-): Response {
+  context?: Pick<ExecutionContext, 'waitUntil'>,
+): Promise<Response> {
   // Fixed enums and a bounded status are the only diagnostic data retained.
   try {
     console.warn('contact_verification_unavailable', {
@@ -55,6 +48,7 @@ function verificationUnavailable(
   } catch {
     // Diagnostics must never alter the fail-closed response.
   }
+  await updateContactIncident(env, 'verification', true, context);
   return json(502, 'Security verification is unavailable. Please try again.');
 }
 
@@ -103,29 +97,16 @@ async function readBody(request: Request): Promise<string | null> {
     bytes,
   );
 }
-function ready(env: ContactEnvironment): boolean {
-  return (
-    env.CONTACT_ENABLED === 'true' &&
-    env.CONTACT_DELIVERY_VERIFIED === 'true' &&
-    Boolean(
-      env.TURNSTILE_SECRET?.trim() &&
-      gmailConfigured(env) &&
-      env.CONTACT_RATE_LIMITER &&
-      env.CONTACT_FROM?.trim() &&
-      env.CONTACT_TO?.trim() &&
-      env.TURNSTILE_HOSTNAME?.trim(),
-    )
-  );
-}
 /** Tests inject fetch; visitor input never chooses an external destination. */
 export async function handleContact(
   request: Request,
   env: ContactEnvironment,
   fetcher: typeof fetch = fetch,
+  context?: Pick<ExecutionContext, 'waitUntil'>,
 ): Promise<Response> {
   if (request.method !== 'POST')
     return json(405, 'Use the contact form to submit an inquiry.');
-  if (!ready(env))
+  if (!contactAvailable(env))
     return json(
       503,
       'Contact submissions are not available yet. No message was sent.',
@@ -225,19 +206,31 @@ export async function handleContact(
     );
   } catch (error) {
     return verificationUnavailable(
+      env,
       'request',
       verificationFailureReason(error, verificationSignal),
+      undefined,
+      context,
     );
   }
   if (!verification.ok)
-    return verificationUnavailable('response', 'http', verification.status);
+    return verificationUnavailable(
+      env,
+      'response',
+      'http',
+      verification.status,
+      context,
+    );
   let verdict: unknown;
   try {
     verdict = await verification.json();
   } catch (error) {
     return verificationUnavailable(
+      env,
       'response',
       verificationFailureReason(error, verificationSignal),
+      undefined,
+      context,
     );
   }
   if (
@@ -260,6 +253,7 @@ export async function handleContact(
         },
       },
     );
+  await updateContactIncident(env, 'verification', false, context);
   try {
     const category = inquiryCategories.find(
       (item) => item.value === submission.category,
@@ -274,16 +268,20 @@ export async function handleContact(
       },
       fetcher,
     );
-    if (!accepted)
+    if (!accepted) {
+      await updateContactIncident(env, 'delivery', true, context);
       return json(
         502,
         'The email service did not confirm acceptance. Please try again later.',
       );
+    }
+    await updateContactIncident(env, 'delivery', false, context);
     return json(
       200,
       'Your inquiry was accepted by our email service. Thank you for getting in touch.',
     );
   } catch {
+    await updateContactIncident(env, 'delivery', true, context);
     return json(
       502,
       'We could not confirm email acceptance. Please wait before trying again.',
@@ -321,11 +319,11 @@ export function applySecurityHeaders(
     'Content-Security-Policy',
     [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com",
+      "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://static.cloudflareinsights.com/beacon.min.js",
       "style-src 'self' 'unsafe-inline'",
       "img-src 'self' data:",
       "font-src 'self'",
-      "connect-src 'self' https://challenges.cloudflare.com",
+      "connect-src 'self' https://challenges.cloudflare.com https://cloudflareinsights.com",
       'frame-src https://challenges.cloudflare.com',
       "frame-ancestors 'none'",
       "base-uri 'self'",
@@ -336,7 +334,7 @@ export function applySecurityHeaders(
   return result;
 }
 export default {
-  async fetch(request, env): Promise<Response> {
+  async fetch(request, env, context): Promise<Response> {
     try {
       const indexingEnabled = env.SITE_INDEXING === 'enabled';
       const redirect = indexingEnabled ? canonicalRedirect(request) : null;
@@ -344,10 +342,12 @@ export default {
       const pathname = new URL(request.url).pathname;
       const response =
         pathname === '/api/contact' || pathname === '/api/contact/'
-          ? await handleContact(request, env)
-          : pathname.startsWith('/api/')
-            ? json(404, 'Endpoint not found.')
-            : await env.ASSETS.fetch(request);
+          ? await handleContact(request, env, fetch, context)
+          : pathname === '/api/health' || pathname === '/api/health/'
+            ? await handleHealth(request, env)
+            : pathname.startsWith('/api/')
+              ? json(404, 'Endpoint not found.')
+              : await env.ASSETS.fetch(request);
       return applySecurityHeaders(
         response,
         indexingEnabled && !pathname.startsWith('/api/'),

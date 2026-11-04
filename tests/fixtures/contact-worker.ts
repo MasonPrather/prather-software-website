@@ -1,4 +1,5 @@
 import { handleContact, type ContactEnvironment } from '../../worker/index';
+import { handleHealth, type HealthEnvironment } from '../../worker/health';
 
 // Inert fixtures only. This entry point is used exclusively by the local harness.
 const origin = 'https://staging.example.com';
@@ -14,6 +15,15 @@ const scenarios = [
   'send-redirect',
 ] as const;
 type Scenario = (typeof scenarios)[number];
+const healthScenarios = [
+  'health-public',
+  'health-authorized',
+  'health-denied',
+  'health-incident',
+  'health-refresh-redirect',
+  'health-state-unavailable',
+] as const;
+type HealthScenario = (typeof healthScenarios)[number];
 
 const environment = {
   CONTACT_ENABLED: 'true',
@@ -89,18 +99,95 @@ async function run(scenario: Scenario) {
   });
 }
 
+async function runHealth(scenario: HealthScenario, incoming?: Request) {
+  let calls = 0;
+  let endpointsMatch = true;
+  let manualRedirects = true;
+  const credential = 'a'.repeat(64); // Inert fixture only, never a deployed secret.
+  const fetcher = (async (input: RequestInfo | URL, init?: RequestInit) => {
+    const nativeRequest = new Request(input, init);
+    calls++;
+    endpointsMatch &&=
+      nativeRequest.url === endpoints[1] && nativeRequest.method === 'POST';
+    manualRedirects &&= nativeRequest.redirect === 'manual';
+    if (!endpointsMatch || !manualRedirects)
+      throw new Error('Unexpected health fixture upstream request.');
+    if (scenario === 'health-refresh-redirect')
+      return new Response(null, {
+        status: 302,
+        headers: { Location: 'https://redirect.invalid/not-followed' },
+      });
+    return Response.json({
+      access_token: 'unit-test-access-token',
+      token_type: 'Bearer',
+      scope: 'https://www.googleapis.com/auth/gmail.send',
+    });
+  }) as typeof fetch;
+  const env: HealthEnvironment = {
+    ...environment,
+    HEALTHCHECK_TOKEN: credential,
+    MONITORING_STATE: {
+      get: async (key: string) => {
+        if (scenario === 'health-state-unavailable')
+          throw new Error('Fixture store unavailable');
+        return scenario === 'health-incident' && key === 'contact:delivery'
+          ? 'fixture incident'
+          : null;
+      },
+      put: async () => {},
+      delete: async () => {},
+    } as HealthEnvironment['MONITORING_STATE'],
+  };
+  const publicProbe = scenario === 'health-public';
+  const response = await handleHealth(
+    incoming ??
+      new Request(`${origin}/api/health`, {
+        method: publicProbe ? 'GET' : 'POST',
+        headers: publicProbe
+          ? {}
+          : {
+              Authorization:
+                'Bearer ' +
+                (scenario === 'health-denied' ? 'b'.repeat(64) : credential),
+            },
+      }),
+    env,
+    fetcher,
+  );
+  const result = (await response.json()) as {
+    ok?: unknown;
+    contactAvailable?: unknown;
+  };
+  if (publicProbe && (result.ok !== true || result.contactAvailable !== true))
+    throw new Error('Unexpected public health fixture response.');
+  if (!publicProbe && result.ok !== (response.status === 200))
+    throw new Error('Unexpected private health fixture response.');
+  return Response.json({
+    status: response.status,
+    calls,
+    endpointsMatch,
+    manualRedirects,
+  });
+}
+
 export default {
   async fetch(request: Request): Promise<Response> {
     const pathname = new URL(request.url).pathname;
+    if (pathname === '/incoming-health' && request.method === 'POST')
+      return runHealth('health-authorized', request);
     if (request.method !== 'GET') return new Response(null, { status: 405 });
     if (pathname === '/health')
       return new Response(null, {
         status: 204,
         headers: { 'X-Contact-Fixture': 'workerd-runtime' },
       });
-    const scenario = pathname.slice('/case/'.length) as Scenario;
-    if (!pathname.startsWith('/case/') || !scenarios.includes(scenario))
+    const scenario = pathname.slice('/case/'.length);
+    if (!pathname.startsWith('/case/'))
       return new Response(null, { status: 404 });
-    return run(scenario);
+    if (healthScenarios.includes(scenario as HealthScenario))
+      return runHealth(scenario as HealthScenario);
+    if (scenarios.includes(scenario as Scenario))
+      return run(scenario as Scenario);
+    return new Response(null, { status: 404 });
   },
 };

@@ -9,6 +9,12 @@
   "routes": [
     { "pattern": "staging.prathersoftware.com", "custom_domain": true },
   ],
+  "kv_namespaces": [
+    {
+      "binding": "MONITORING_STATE",
+      "id": "d5bf5f248de54349865abf73f508fa50",
+    },
+  ],
   "assets": {
     "directory": "./dist",
     "binding": "ASSETS",
@@ -40,6 +46,12 @@
       "routes": [
         { "pattern": "prathersoftware.com", "custom_domain": true },
         { "pattern": "www.prathersoftware.com", "custom_domain": true },
+      ],
+      "kv_namespaces": [
+        {
+          "binding": "MONITORING_STATE",
+          "id": "9758844c87e646a48591e673ef40ae2f",
+        },
       ],
       "vars": {
         "SITE_INDEXING": "enabled",

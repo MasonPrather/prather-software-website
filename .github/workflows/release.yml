@@ -1,0 +1,102 @@
+name: Website release
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Website to prepare or publish
+        required: true
+        default: staging
+        type: choice
+        options: [staging, production]
+      source_sha:
+        description: Full 40-character commit SHA already merged into main
+        required: true
+        type: string
+      dry_run:
+        description: Check the release without uploading it
+        required: true
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ inputs.environment }}
+  cancel-in-progress: false
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      RELEASE_ENVIRONMENT: ${{ inputs.environment }}
+      RELEASE_SHA: ${{ inputs.source_sha }}
+      WRANGLER_WRITE_LOGS: 'false'
+      WRANGLER_LOG_SANITIZE: 'true'
+    steps:
+      - name: Require this repository's main release workflow
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$GITHUB_REF" == refs/heads/main ]]
+          [[ "$GITHUB_REPOSITORY" == MasonPrather/prather-software-website ]]
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Require a complete source commit from main
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$RELEASE_SHA" =~ ^[a-f0-9]{40}$ ]]
+          [[ "$RELEASE_ENVIRONMENT" == staging || "$RELEASE_ENVIRONMENT" == production ]]
+          git cat-file -e "$RELEASE_SHA^{commit}"
+          git merge-base --is-ancestor "$RELEASE_SHA" origin/main
+          git checkout --detach "$RELEASE_SHA"
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm audit --audit-level=high
+      - run: npx playwright install --with-deps chromium firefox webkit
+      - run: npm run verify
+      - name: Prepare the exact target with no upload
+        run: node scripts/release.mjs --environment "$RELEASE_ENVIRONMENT" --source-sha "$RELEASE_SHA" --dry-run
+
+  publish:
+    needs: verify
+    if: ${{ !inputs.dry_run }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: ${{ inputs.environment }}
+    env:
+      RELEASE_ENVIRONMENT: ${{ inputs.environment }}
+      RELEASE_SHA: ${{ inputs.source_sha }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Recheck the reviewed source before publishing
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$RELEASE_SHA" =~ ^[a-f0-9]{40}$ ]]
+          [[ "$RELEASE_ENVIRONMENT" == staging || "$RELEASE_ENVIRONMENT" == production ]]
+          git merge-base --is-ancestor "$RELEASE_SHA" origin/main
+          git checkout --detach "$RELEASE_SHA"
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Publish and check the selected website
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: node scripts/release.mjs --environment "$RELEASE_ENVIRONMENT" --source-sha "$RELEASE_SHA" --deploy

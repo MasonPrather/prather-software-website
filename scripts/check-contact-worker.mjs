@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
+import http from 'node:http';
 import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import net from 'node:net';
 import { tmpdir } from 'node:os';
@@ -102,6 +103,12 @@ try {
     ['verification-redirect', 502, 1],
     ['refresh-redirect', 502, 2],
     ['send-redirect', 502, 3],
+    ['health-public', 200, 0],
+    ['health-authorized', 200, 1],
+    ['health-denied', 401, 0],
+    ['health-incident', 503, 0],
+    ['health-refresh-redirect', 503, 1],
+    ['health-state-unavailable', 503, 0],
   ]) {
     const response = await fetch(`${origin}/case/${scenario}`, {
       redirect: 'manual',
@@ -115,8 +122,113 @@ try {
     );
     console.log(`${scenario}: status ${status}, upstream calls ${calls}.`);
   }
+
+  async function expectIncoming(label, response, status, calls) {
+    assert.equal(response.status, 200, `${label}: fixture HTTP response`);
+    assert.deepEqual(
+      await response.json(),
+      { status, calls, endpointsMatch: true, manualRedirects: true },
+      `${label}: real incoming HTTP body`,
+    );
+    console.log(`${label}: status ${status}, upstream calls ${calls}.`);
+  }
+  const authorization = 'Bearer ' + 'a'.repeat(64); // Inert local fixture only.
+  await expectIncoming(
+    'incoming POST without body',
+    await fetch(`${origin}/incoming-health`, {
+      method: 'POST',
+      headers: { Authorization: authorization },
+      signal: AbortSignal.timeout(5000),
+    }),
+    200,
+    1,
+  );
+  await expectIncoming(
+    'incoming POST empty string',
+    await fetch(`${origin}/incoming-health`, {
+      method: 'POST',
+      headers: { Authorization: authorization },
+      body: '',
+      signal: AbortSignal.timeout(5000),
+    }),
+    200,
+    1,
+  );
+  await expectIncoming(
+    'incoming POST nonempty body',
+    await fetch(`${origin}/incoming-health`, {
+      method: 'POST',
+      headers: { Authorization: authorization },
+      body: 'x',
+      signal: AbortSignal.timeout(5000),
+    }),
+    400,
+    0,
+  );
+  for (const [label, headers, payload, stalled] of [
+    [
+      'incoming native Content-Length zero',
+      { 'Content-Length': '0' },
+      undefined,
+      false,
+    ],
+    [
+      'incoming empty chunked body',
+      { 'Transfer-Encoding': 'chunked' },
+      undefined,
+      false,
+    ],
+    [
+      'incoming nonempty chunked body',
+      { 'Transfer-Encoding': 'chunked' },
+      'x',
+      false,
+    ],
+    [
+      'incoming stalled chunked body',
+      { 'Transfer-Encoding': 'chunked' },
+      undefined,
+      true,
+    ],
+  ]) {
+    const response = await new Promise((resolve, reject) => {
+      const request = http.request(
+        `${origin}/incoming-health`,
+        {
+          method: 'POST',
+          headers: { Authorization: authorization, ...headers },
+        },
+        (response) => {
+          const chunks = [];
+          response.on('data', (chunk) => chunks.push(chunk));
+          response.on('end', () => {
+            resolve(
+              new Response(Buffer.concat(chunks), {
+                status: response.statusCode,
+              }),
+            );
+            request.destroy();
+          });
+          response.on('error', reject);
+        },
+      );
+      request.setTimeout(5000, () =>
+        request.destroy(new Error('Local fixture request timed out.')),
+      );
+      request.on('error', reject);
+      if (stalled) request.flushHeaders();
+      else request.end(payload);
+    });
+    const rejected = Boolean(payload || stalled);
+    await expectIncoming(
+      label,
+      response,
+      rejected ? 400 : 200,
+      rejected ? 0 : 1,
+    );
+  }
   console.log(
-    'Verified four local workerd contact scenarios; no external requests or emails.',
+    'Verified ten local workerd scenarios and seven real incoming HTTP health requests; no external requests or emails.',
   );
 } finally {
   if (server?.pid && server.exitCode === null && server.signalCode === null) {

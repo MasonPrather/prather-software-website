@@ -18,6 +18,46 @@ export interface GmailInquiry {
 
 const DELIVERY_TIMEOUT_MS = 10_000;
 const MAX_PROVIDER_BYTES = 32_768;
+const SEND_SCOPE = 'https://www.googleapis.com/auth/gmail.send';
+type GmailStage = 'oauth-refresh' | 'gmail-send';
+type DiagnosticEvent =
+  'contact_delivery_unavailable' | 'contact_authorization_unavailable';
+
+function diagnostic(
+  event: DiagnosticEvent,
+  stage: GmailStage,
+  reason: 'http' | 'invalid-response' | 'exception' | 'timeout',
+  status?: number,
+): void {
+  // Never retain provider bodies, error messages, inquiry data, or credentials.
+  try {
+    console.warn(
+      JSON.stringify({
+        event,
+        stage,
+        reason,
+        ...(typeof status === 'number' &&
+        Number.isInteger(status) &&
+        status >= 100 &&
+        status <= 599
+          ? { status }
+          : {}),
+      }),
+    );
+  } catch {
+    // A diagnostic failure must not change delivery or retry behavior.
+  }
+}
+
+function exceptionReason(
+  error: unknown,
+  signal: AbortSignal,
+): 'exception' | 'timeout' {
+  return signal.aborted ||
+    (error instanceof Error && error.name === 'TimeoutError')
+    ? 'timeout'
+    : 'exception';
+}
 const atom = "[A-Za-z0-9!#$%&'*+/=?^_\\x60{|}~-]+";
 const domainLabel = '[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?';
 const mailbox = new RegExp(
@@ -150,6 +190,82 @@ async function providerObject(
   return parsed as Record<string, unknown>;
 }
 
+async function refreshAccessToken(
+  env: GmailEnvironment,
+  fetcher: typeof fetch,
+  signal: AbortSignal,
+  event: DiagnosticEvent,
+  verifyScope = false,
+): Promise<string | null> {
+  let refreshed: Response;
+  try {
+    // Workers supports manual redirects; reject non-2xx without forwarding secrets.
+    refreshed = await fetcher('https://oauth2.googleapis.com/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        grant_type: 'refresh_token',
+        client_id: env.GMAIL_CLIENT_ID!,
+        client_secret: env.GMAIL_CLIENT_SECRET!,
+        refresh_token: env.GMAIL_REFRESH_TOKEN!,
+      }),
+      redirect: 'manual',
+      signal,
+    });
+  } catch (error) {
+    diagnostic(event, 'oauth-refresh', exceptionReason(error, signal));
+    throw error;
+  }
+  if (!refreshed.ok) {
+    diagnostic(event, 'oauth-refresh', 'http', refreshed.status);
+    await refreshed.body?.cancel();
+    return null;
+  }
+  let token: Record<string, unknown>;
+  try {
+    token = await providerObject(refreshed);
+  } catch (error) {
+    diagnostic(
+      event,
+      'oauth-refresh',
+      signal.aborted ? 'timeout' : 'invalid-response',
+    );
+    throw error;
+  }
+  if (
+    typeof token.access_token !== 'string' ||
+    /[^\x21-\x7e]/.test(token.access_token) ||
+    !/^[A-Za-z0-9._~+\/-]+=*$/.test(token.access_token) ||
+    (verifyScope &&
+      (token.token_type !== 'Bearer' || token.scope !== SEND_SCOPE))
+  ) {
+    diagnostic(event, 'oauth-refresh', 'invalid-response');
+    return null;
+  }
+  return token.access_token;
+}
+
+/** Confirms authorization only. This function never calls Gmail's send endpoint. */
+export async function checkGmailAuthorization(
+  env: GmailEnvironment,
+  fetcher: typeof fetch = fetch,
+): Promise<boolean> {
+  if (!gmailConfigured(env)) return false;
+  try {
+    return Boolean(
+      await refreshAccessToken(
+        env,
+        fetcher,
+        AbortSignal.timeout(DELIVERY_TIMEOUT_MS),
+        'contact_authorization_unavailable',
+        true,
+      ),
+    );
+  } catch {
+    return false;
+  }
+}
+
 /** True means Gmail accepted the message, never a promise of inbox delivery. */
 export async function sendGmailInquiry(
   env: GmailEnvironment,
@@ -160,48 +276,64 @@ export async function sendGmailInquiry(
   const raw = rawMessage(env, inquiry);
   // One deadline covers token refresh, send, and response-body consumption.
   const signal = AbortSignal.timeout(DELIVERY_TIMEOUT_MS);
-  // Workers supports manual redirects; reject every non-2xx response below.
-  // Never forward OAuth credentials or message data to a redirect destination.
-  const refreshed = await fetcher('https://oauth2.googleapis.com/token', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({
-      grant_type: 'refresh_token',
-      client_id: env.GMAIL_CLIENT_ID!,
-      client_secret: env.GMAIL_CLIENT_SECRET!,
-      refresh_token: env.GMAIL_REFRESH_TOKEN!,
-    }),
-    redirect: 'manual',
+  const accessToken = await refreshAccessToken(
+    env,
+    fetcher,
     signal,
-  });
-  if (!refreshed.ok) {
-    await refreshed.body?.cancel();
-    return false;
-  }
-  const token = await providerObject(refreshed);
-  if (
-    typeof token.access_token !== 'string' ||
-    /[^\x21-\x7e]/.test(token.access_token) ||
-    !/^[A-Za-z0-9._~+\/-]+=*$/.test(token.access_token)
-  )
-    return false;
-  const sent = await fetcher(
-    'https://gmail.googleapis.com/gmail/v1/users/me/messages/send',
-    {
-      method: 'POST',
-      headers: {
-        Authorization: 'Bearer ' + token.access_token,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ raw }),
-      redirect: 'manual',
-      signal,
-    },
+    'contact_delivery_unavailable',
   );
+  if (!accessToken) return false;
+  let sent: Response;
+  try {
+    sent = await fetcher(
+      'https://gmail.googleapis.com/gmail/v1/users/me/messages/send',
+      {
+        method: 'POST',
+        headers: {
+          Authorization: 'Bearer ' + accessToken,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ raw }),
+        redirect: 'manual',
+        signal,
+      },
+    );
+  } catch (error) {
+    diagnostic(
+      'contact_delivery_unavailable',
+      'gmail-send',
+      exceptionReason(error, signal),
+    );
+    throw error;
+  }
   if (!sent.ok) {
+    diagnostic(
+      'contact_delivery_unavailable',
+      'gmail-send',
+      'http',
+      sent.status,
+    );
     await sent.body?.cancel();
     return false;
   }
-  const receipt = await providerObject(sent);
-  return typeof receipt.id === 'string' && receipt.id.trim().length > 0;
+  let receipt: Record<string, unknown>;
+  try {
+    receipt = await providerObject(sent);
+  } catch (error) {
+    diagnostic(
+      'contact_delivery_unavailable',
+      'gmail-send',
+      signal.aborted ? 'timeout' : 'invalid-response',
+    );
+    throw error;
+  }
+  const accepted =
+    typeof receipt.id === 'string' && receipt.id.trim().length > 0;
+  if (!accepted)
+    diagnostic(
+      'contact_delivery_unavailable',
+      'gmail-send',
+      'invalid-response',
+    );
+  return accepted;
 }

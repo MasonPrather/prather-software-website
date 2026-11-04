@@ -102,6 +102,88 @@ function decodedMail(call: { init?: RequestInit }) {
   };
 }
 
+for (const [label, options, expected] of [
+  [
+    'refresh rejection',
+    {
+      oauth: () =>
+        new Response('unit-client-secret ada@example.com', { status: 403 }),
+    },
+    {
+      event: 'contact_delivery_unavailable',
+      stage: 'oauth-refresh',
+      reason: 'http',
+      status: 403,
+    },
+  ],
+  [
+    'send rejection',
+    {
+      delivery: () =>
+        new Response('unit-access-token ada@example.com', { status: 500 }),
+    },
+    {
+      event: 'contact_delivery_unavailable',
+      stage: 'gmail-send',
+      reason: 'http',
+      status: 500,
+    },
+  ],
+  [
+    'invalid send receipt',
+    {
+      delivery: () =>
+        new Response('unit-client-secret fresh-unit-token {malformed'),
+    },
+    {
+      event: 'contact_delivery_unavailable',
+      stage: 'gmail-send',
+      reason: 'invalid-response',
+    },
+  ],
+  [
+    'refresh timeout',
+    {
+      oauth: () => {
+        throw new DOMException(
+          'unit-refresh-token ada@example.com',
+          'TimeoutError',
+        );
+      },
+    },
+    {
+      event: 'contact_delivery_unavailable',
+      stage: 'oauth-refresh',
+      reason: 'timeout',
+    },
+  ],
+] as const) {
+  test(`Gmail ${label} diagnostics contain only bounded failure categories`, async (context) => {
+    const warning = context.mock.method(console, 'warn', () => {});
+    const upstream = mock(options);
+    await rejected(
+      await handleContact(request(), environment(), upstream.fetcher),
+    );
+    assert.deepEqual(
+      warning.mock.calls.map((call) => JSON.parse(call.arguments[0] as string)),
+      [expected],
+    );
+  });
+}
+
+test('failed Gmail diagnostic output cannot change rejection or cause a retry', async (context) => {
+  context.mock.method(console, 'warn', () => {
+    throw new Error('Diagnostic unavailable');
+  });
+  const upstream = mock({
+    delivery: () => new Response('private', { status: 403 }),
+  });
+  await rejected(
+    await handleContact(request(), environment(), upstream.fetcher),
+  );
+  assert.equal(upstream.calls.length, 3);
+});
+
 test('Gmail refresh and send use fixed endpoints, POST, no redirects and one bounded signal', async () => {
   const upstream = mock();
   const response = await handleContact(

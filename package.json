@@ -22,7 +22,9 @@
     "test:runtime": "node scripts/check-worker.mjs && node scripts/check-worker.mjs --production && node scripts/check-contact-worker.mjs",
     "test:production": "node scripts/check-production.mjs",
     "test:production:browser": "node scripts/check-production-browser.mjs",
-    "gmail:authorize": "node scripts/gmail-authorize.mjs"
+    "gmail:authorize": "node scripts/gmail-authorize.mjs",
+    "release": "node scripts/release.mjs",
+    "monitor": "node scripts/monitor.mjs"
   },
   "dependencies": {
     "astro": "^7.4.4"
