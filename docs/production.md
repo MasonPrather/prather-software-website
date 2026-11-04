@@ -22,13 +22,15 @@ npm ci
 npm run verify
 npm audit --audit-level=high
 npx wrangler whoami
-PUBLIC_CONTACT_ENABLED=true PUBLIC_TURNSTILE_SITE_KEY=0x4AAAAAAFsABGQE4Na23nbs npm run build
+PUBLIC_CONTACT_ENABLED=true PUBLIC_TURNSTILE_SITE_KEY=0x4AAAAAAFsABGQE4Na23nbs PUBLIC_WEB_ANALYTICS_ENABLED=true npm run build
 npx wrangler deploy --env production --var CONTACT_ENABLED:true --var CONTACT_DELIVERY_VERIFIED:true
 npm run test:production -- --contact-enabled
 npm run test:production:browser -- --contact-enabled
 ```
 
 `verify` includes local staging/production runtime checks and dry runs for both configurations. The app connector and Wrangler CLI authenticate separately. Wrangler OAuth may store credentials in the OS Keychain with `--use-keyring`; never copy connector tokens or paste credentials into chat. Use the verified account above. Adding Custom Domains requires Workers Routes Write for the zone as well as Worker deployment access. Cloudflare provisions DNS and certificates for the exact Custom Domains; do not add wildcard routes.
+
+For the controlled default-branch workflow and exact-source wrapper, follow [releases](releases.md). Production Actions jobs require owner approval; scheduled monitoring is separately gated and described in [monitoring](monitoring.md). Current setup/activation limits are recorded in [launch readiness](launch-readiness.md). The dated deployment records below remain historical evidence; later controlled releases also record their exact source and version in Actions deployment history.
 
 After deployment, verify HTTPS and all sitemap pages, static assets, canonical/OG metadata, robots/sitemap, www redirect, branded 404 status, security headers, production indexing, and active contact configuration. Check the existing privacy domain and Worker metadata for unintended changes. Run both production checks with `--contact-enabled` against this exact `dist/` build. They compare live pages/assets, check the enabled UI and real Turnstile loading without submitting an inquiry, and print the separate privacy-page hash. The default check modes expect disabled collection and send one empty POST; use them only after a deliberate disable. These remote checks are excluded from PR/local CI. Record the deployed source commit and Cloudflare version ID below. Upload success does not establish a working live site.
 

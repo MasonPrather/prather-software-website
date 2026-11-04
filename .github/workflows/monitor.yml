@@ -16,7 +16,10 @@ concurrency:
   cancel-in-progress: false
 jobs:
   monitor:
-    if: github.repository == 'MasonPrather/prather-software-website' && github.ref == 'refs/heads/main'
+    if: >-
+      github.repository == 'MasonPrather/prather-software-website' &&
+      github.ref == 'refs/heads/main' &&
+      (github.event_name == 'workflow_dispatch' || vars.WEBSITE_MONITOR_ENABLED == 'true')
     runs-on: ubuntu-latest
     timeout-minutes: 5
     environment: monitoring

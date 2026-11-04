@@ -6,7 +6,7 @@ The owner requested the remaining launch setup on November 4, 2026, with a $0 st
 
 Google Search Console's Domain property `sc-domain:prathersoftware.com` is registered to the owner's business Google account. Ownership was automatically verified through the existing domain-provider record; no DNS change was needed. Google accepted `https://prathersoftware.com/sitemap.xml`, reported Success, and discovered 13 pages on November 4. Initial performance/indexing reports are still processing. Discovery and a submitted indexing request do not establish completed indexing or search placement.
 
-The homepage's initial inspection reported Discovered — currently not indexed. Its indexing request was initiated; the final request result and any subsequent indexed status must be recorded separately.
+The homepage's initial inspection reported Discovered — currently not indexed. Google's live test then confirmed URL is available to Google and Page can be indexed. The indexing request was accepted into its priority crawl queue. Actual indexing/search placement remains subject to Google's processing.
 
 ## Free services and limits
 
@@ -27,9 +27,12 @@ No existing Google Workspace or domain-renewal charges are removed by this setup
 
 - GitHub environments `production`, `staging`, and `monitoring` exist with main-only branch policies. `production` requires approval by MasonPrather; the monitoring environment has no hourly approval gate.
 - Default GitHub Actions permissions are read-only, and workflows cannot approve pull requests. The monitor alone requests issue-write access.
+- Main requires pull requests, the passing `verify` check from the GitHub Actions app, an up-to-date source branch, resolved conversations, and linear history. Force pushes/deletions are blocked, including for admins. A second reviewer is not required for the founder-led repository.
+- Weekly dependency/Actions update pull requests are configured without automatic merging. Repository vulnerability alerts and automated security-update pull requests are enabled and verified; retain manual review and the required quality gate. The weekly file takes effect after the reviewed default-branch merge.
 - The private monitoring credential requires explicit owner approval before creation and storage on the production Worker and the main-only GitHub monitoring environment. It permits only the authenticated health probe; it does not expose mailbox contents or permit website editing.
 - Actual deployments from Actions require a separate narrowly scoped Cloudflare CI token stored privately in the selected release environment. Connector/CLI OAuth tokens must never be copied into CI.
 - The original instruction says not to merge automatically. The reviewed pull request must receive owner merge approval before new default-branch schedules can run.
+- Scheduled monitoring also remains off until repository variable `WEBSITE_MONITOR_ENABLED` is explicitly set to `true` after a passing notification self-test and real check. Manual main-branch runs remain available before that flag is enabled.
 - Public analytics metadata and KV identifiers are in `ops/`; credentials are not. Keep automatic RUM injection disabled so the manually controlled production beacon is the only analytics script.
 
 See [monitoring](monitoring.md) and [releases](releases.md) for operation, tests, and activation requirements. Prepared source is not proof that a schedule, notification, or deployment has run successfully.

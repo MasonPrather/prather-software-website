@@ -1,6 +1,6 @@
 # Free website monitoring
 
-The `Website monitor` GitHub Actions workflow checks the public website at minute 17 of each hour. It uses standard Ubuntu runners in the existing public repository, Node 24, and built-in modules only. It has no package installation, artifacts, paid monitoring account, or independent email provider.
+The `Website monitor` GitHub Actions workflow can check the public website at minute 17 of each hour after explicit activation. Scheduled jobs default off while credentials or approvals are pending; a merge alone does not activate them. It uses standard Ubuntu runners in the existing public repository, Node 24, and built-in modules only. It has no package installation, artifacts, paid monitoring account, or independent email provider.
 
 ## What it checks
 
@@ -21,13 +21,14 @@ Ownership checks require the dedicated label, unique HTML marker, owner assignme
 
 ## Required configuration
 
-The workflow must be merged into `main` to run on a schedule. Its job allows only this repository and `refs/heads/main`; it never runs from pull requests. The `monitoring` GitHub environment should allow only `main` and should not require approval for each hourly run.
+The workflow must be merged into `main` to run on a schedule. Its job allows only this repository and `refs/heads/main`; it never runs from pull requests. The `monitoring` GitHub environment should allow only `main` and should not require approval for each hourly run. Scheduled jobs also require repository Actions variable `WEBSITE_MONITOR_ENABLED` to equal the literal string `true`. An unset or false value skips scheduled jobs while preserving manual runs on `main`.
 
 - Worker secret: `HEALTHCHECK_TOKEN`, generated from 32 cryptographically random bytes and encoded as 64 hexadecimal characters.
 - GitHub environment secret in `monitoring`: `WEBSITE_HEALTHCHECK_TOKEN`, containing the same value.
 - Workflow token: automatic, ephemeral `GITHUB_TOKEN`, with only `contents: read` and `issues: write`.
 - Repository label: `website-monitor`.
 - Worker binding: environment-specific `MONITORING_STATE` KV namespaces, separate for staging and production.
+- Activation switch: repository Actions variable `WEBSITE_MONITOR_ENABLED`, set to `true` only after the notification self-test and real manual monitor both pass.
 
 Keep private values out of commands, chat, logs, and Git. Supply them through protected secret-management input. The monitor does not need a Cloudflare API token or stored GitHub personal token. The deployment workflow uses separate access.
 
@@ -41,9 +42,11 @@ KV propagation is eventually consistent, so incident visibility is not immediate
 
 ## Run or test it
 
-In GitHub, open Actions → Website monitor → Run workflow, select `main`, and leave `self_test` false for a real check.
+Keep `WEBSITE_MONITOR_ENABLED` unset or false during setup. After the reviewed workflow is merged and the approved private configuration is installed, open Actions → Website monitor → Run workflow and select `main`.
 
-For a notification check, set `self_test` true. This creates a clearly named `[TEST]` incident, then comments and closes it as a simulated recovery. It uses a separate marker and cannot close a production incident. It performs no website probes or application changes. A green self-test confirms that notification cycle, not production health.
+First set `self_test` true for a notification check. This creates a clearly named `[TEST]` incident, then closes it and records a simulated recovery. It uses a separate marker and cannot close a production incident. It performs no website probes or application changes. A green self-test confirms that notification cycle, not production health.
+
+Next run manually with `self_test` false for a real check. Only after that run and the notification self-test pass, set repository variable `WEBSITE_MONITOR_ENABLED=true` as the last activation step. This enables hourly jobs. Clearing the variable or setting it false disables scheduled jobs without removing manual access. Do not describe scheduled monitoring as active until this flag is enabled and subsequent run history is verified.
 
 Actual failed checks exit unsuccessfully even when issue notification also fails. Inspect Actions for the bounded failure summary. Fix the underlying problem; if a delivery incident remains, submit a new, clearly identified inquiry once after resolving the cause and confirm acceptance. Never retry an inquiry whose acceptance was uncertain without first checking its receipt.
 
