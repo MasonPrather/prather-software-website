@@ -19,7 +19,7 @@
     "test:secrets": "node scripts/check-secrets.mjs",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "test:runtime": "node scripts/check-worker.mjs && node scripts/check-worker.mjs --production",
+    "test:runtime": "node scripts/check-worker.mjs && node scripts/check-worker.mjs --production && node scripts/check-contact-worker.mjs",
     "test:production": "node scripts/check-production.mjs",
     "test:production:browser": "node scripts/check-production-browser.mjs",
     "gmail:authorize": "node scripts/gmail-authorize.mjs"

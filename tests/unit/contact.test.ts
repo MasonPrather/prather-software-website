@@ -279,7 +279,8 @@ for (const [label, verdict] of [
     { success: 'true', action: 'contact', hostname: 'staging.example.com' },
   ],
 ] as const) {
-  test(`${label} prevents email`, async () => {
+  test(`${label} prevents email`, async (context) => {
+    const warning = context.mock.method(console, 'warn', () => {});
     const mock = providerMock(verdict);
     await rejected(
       await handleContact(
@@ -290,11 +291,120 @@ for (const [label, verdict] of [
       403,
     );
     assert.equal(mock.calls.length, 1);
+    assert.equal(warning.mock.calls.length, 0);
   });
 }
-test('Turnstile network failure cannot produce success', async () => {
+test('Turnstile network failure cannot produce success', async (context) => {
+  context.mock.method(console, 'warn', () => {});
   const fetcher = (async () => {
     throw new Error('network failure');
+  }) as typeof fetch;
+  await rejected(
+    await handleContact(request(validSubmission), environment(), fetcher),
+    502,
+  );
+});
+test('Turnstile redirects are rejected without following or reaching Gmail', async (context) => {
+  const warning = context.mock.method(console, 'warn', () => {});
+  let calls = 0;
+  const fetcher = (async (input, init) => {
+    calls++;
+    assert.equal(
+      String(input),
+      'https://challenges.cloudflare.com/turnstile/v0/siteverify',
+    );
+    assert.equal(init?.redirect, 'manual');
+    return new Response(null, {
+      status: 302,
+      headers: { Location: 'https://attacker.example.com/unit-test-secret' },
+    });
+  }) as typeof fetch;
+  await rejected(
+    await handleContact(request(validSubmission), environment(), fetcher),
+    502,
+  );
+  assert.equal(calls, 1);
+  assert.deepEqual(
+    warning.mock.calls.map((call) => call.arguments),
+    [
+      [
+        'contact_verification_unavailable',
+        { stage: 'response', reason: 'http', status: 302 },
+      ],
+    ],
+  );
+});
+for (const [label, failure, reason] of [
+  [
+    'request exception',
+    new Error('unit-test-secret fresh-test-token ada@example.com'),
+    'exception',
+  ],
+  [
+    'request timeout',
+    new DOMException('unit-test-refresh-token 203.0.113.7', 'TimeoutError'),
+    'timeout',
+  ],
+] as const) {
+  test(`Turnstile ${label} logs only a fixed failure category`, async (context) => {
+    const warning = context.mock.method(console, 'warn', () => {});
+    let calls = 0;
+    const fetcher = (async () => {
+      calls++;
+      throw failure;
+    }) as typeof fetch;
+    await rejected(
+      await handleContact(request(validSubmission), environment(), fetcher),
+      502,
+    );
+    assert.equal(calls, 1, 'Verification and delivery must not be retried');
+    assert.deepEqual(
+      warning.mock.calls.map((call) => call.arguments),
+      [['contact_verification_unavailable', { stage: 'request', reason }]],
+    );
+  });
+}
+for (const [label, response, expected] of [
+  [
+    'HTTP failure',
+    new Response('unit-test-secret ada@example.com', { status: 503 }),
+    { stage: 'response', reason: 'http', status: 503 },
+  ],
+  [
+    'malformed JSON',
+    new Response('unit-test-secret fresh-test-token 203.0.113.7 {invalid'),
+    { stage: 'response', reason: 'exception' },
+  ],
+  [
+    'status outside HTTP bounds',
+    Response.error(),
+    { stage: 'response', reason: 'http' },
+  ],
+] as const) {
+  test(`Turnstile ${label} logs no provider body or inquiry data`, async (context) => {
+    const warning = context.mock.method(console, 'warn', () => {});
+    let calls = 0;
+    const fetcher = (async () => {
+      calls++;
+      return response;
+    }) as typeof fetch;
+    await rejected(
+      await handleContact(request(validSubmission), environment(), fetcher),
+      502,
+    );
+    assert.equal(calls, 1);
+    assert.deepEqual(
+      warning.mock.calls.map((call) => call.arguments),
+      [['contact_verification_unavailable', expected]],
+    );
+  });
+}
+test('failed diagnostic output cannot alter the unavailable response', async (context) => {
+  context.mock.method(console, 'warn', () => {
+    throw new Error('Diagnostic output unavailable');
+  });
+  const fetcher = (async () => {
+    throw new Error('unit-test-secret');
   }) as typeof fetch;
   await rejected(
     await handleContact(request(validSubmission), environment(), fetcher),

@@ -160,6 +160,8 @@ export async function sendGmailInquiry(
   const raw = rawMessage(env, inquiry);
   // One deadline covers token refresh, send, and response-body consumption.
   const signal = AbortSignal.timeout(DELIVERY_TIMEOUT_MS);
+  // Workers supports manual redirects; reject every non-2xx response below.
+  // Never forward OAuth credentials or message data to a redirect destination.
   const refreshed = await fetcher('https://oauth2.googleapis.com/token', {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -169,7 +171,7 @@ export async function sendGmailInquiry(
       client_secret: env.GMAIL_CLIENT_SECRET!,
       refresh_token: env.GMAIL_REFRESH_TOKEN!,
     }),
-    redirect: 'error',
+    redirect: 'manual',
     signal,
   });
   if (!refreshed.ok) {
@@ -192,7 +194,7 @@ export async function sendGmailInquiry(
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ raw }),
-      redirect: 'error',
+      redirect: 'manual',
       signal,
     },
   );

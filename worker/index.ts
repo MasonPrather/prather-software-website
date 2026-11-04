@@ -35,6 +35,38 @@ function json(
     { status, headers },
   );
 }
+function verificationUnavailable(
+  stage: 'request' | 'response',
+  reason: 'http' | 'exception' | 'timeout',
+  status?: number,
+): Response {
+  // Fixed enums and a bounded status are the only diagnostic data retained.
+  try {
+    console.warn('contact_verification_unavailable', {
+      stage,
+      reason,
+      ...(typeof status === 'number' &&
+      Number.isInteger(status) &&
+      status >= 100 &&
+      status <= 599
+        ? { status }
+        : {}),
+    });
+  } catch {
+    // Diagnostics must never alter the fail-closed response.
+  }
+  return json(502, 'Security verification is unavailable. Please try again.');
+}
+
+function verificationFailureReason(
+  error: unknown,
+  signal: AbortSignal,
+): 'exception' | 'timeout' {
+  return signal.aborted ||
+    (error instanceof Error && error.name === 'TimeoutError')
+    ? 'timeout'
+    : 'exception';
+}
 /** Bounds actual bytes even if Content-Length is absent or dishonest. */
 async function readBody(request: Request): Promise<string | null> {
   const contentLength = request.headers.get('Content-Length');
@@ -174,8 +206,10 @@ export async function handleContact(
     return json(422, 'Please check the highlighted fields.', {
       errors: { email: 'Enter a valid single email address.' },
     });
+  const verificationSignal = AbortSignal.timeout(REQUEST_TIMEOUT_MS);
+  let verification: Response;
   try {
-    const verification = await fetcher(
+    verification = await fetcher(
       'https://challenges.cloudflare.com/turnstile/v0/siteverify',
       {
         method: 'POST',
@@ -184,39 +218,48 @@ export async function handleContact(
           secret: env.TURNSTILE_SECRET!,
           response: submission.token,
         }),
-        redirect: 'error',
-        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+        // Workers supports manual redirects; non-2xx responses fail closed below.
+        redirect: 'manual',
+        signal: verificationSignal,
       },
     );
-    if (!verification.ok)
-      return json(
-        502,
-        'Security verification is unavailable. Please try again.',
-      );
-    const verdict: unknown = await verification.json();
-    if (
-      !verdict ||
-      typeof verdict !== 'object' ||
-      !('success' in verdict) ||
-      verdict.success !== true ||
-      !('action' in verdict) ||
-      verdict.action !== 'contact' ||
-      !('hostname' in verdict) ||
-      verdict.hostname !== env.TURNSTILE_HOSTNAME
-    )
-      return json(
-        403,
-        'Security verification expired or failed. Please try again.',
-        {
-          errors: {
-            verification:
-              'Complete a new security verification before submitting.',
-          },
-        },
-      );
-  } catch {
-    return json(502, 'Security verification is unavailable. Please try again.');
+  } catch (error) {
+    return verificationUnavailable(
+      'request',
+      verificationFailureReason(error, verificationSignal),
+    );
   }
+  if (!verification.ok)
+    return verificationUnavailable('response', 'http', verification.status);
+  let verdict: unknown;
+  try {
+    verdict = await verification.json();
+  } catch (error) {
+    return verificationUnavailable(
+      'response',
+      verificationFailureReason(error, verificationSignal),
+    );
+  }
+  if (
+    !verdict ||
+    typeof verdict !== 'object' ||
+    !('success' in verdict) ||
+    verdict.success !== true ||
+    !('action' in verdict) ||
+    verdict.action !== 'contact' ||
+    !('hostname' in verdict) ||
+    verdict.hostname !== env.TURNSTILE_HOSTNAME
+  )
+    return json(
+      403,
+      'Security verification expired or failed. Please try again.',
+      {
+        errors: {
+          verification:
+            'Complete a new security verification before submitting.',
+        },
+      },
+    );
   try {
     const category = inquiryCategories.find(
       (item) => item.value === submission.category,

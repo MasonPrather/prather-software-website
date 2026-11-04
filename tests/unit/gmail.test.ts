@@ -117,7 +117,7 @@ test('Gmail refresh and send use fixed endpoints, POST, no redirects and one bou
   const [grant, send] = upstream.calls.slice(1);
   for (const call of [grant!, send!]) {
     assert.equal(call.init?.method, 'POST');
-    assert.equal(call.init?.redirect, 'error');
+    assert.equal(call.init?.redirect, 'manual');
     assert.ok(call.init?.signal instanceof AbortSignal);
     assert.equal(call.init?.signal?.aborted, false);
   }
