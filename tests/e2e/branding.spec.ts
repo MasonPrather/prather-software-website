@@ -1,6 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 
-const poster = '/images/hero-checkerboard.svg';
+const poster = '/images/hero-brand-static.svg';
+const brandAnimation = '/images/hero-brand-animated.svg';
 const animation = '/test-hero.gif';
 
 // Exercise the optional GIF path with the actual production script, without
@@ -24,9 +25,8 @@ async function animatedHero(page: Page, broken = false) {
     const html = (await response.text()).replace(
       /<div\b([^>]*\bdata-hero-backdrop\b[^>]*)>/,
       (_match, attributes: string) => {
-        const scope =
-          attributes.match(/data-astro-cid-[\w-]+/g)?.join(' ') ?? '';
-        return `<div${attributes} data-motion-src="${animation}"><button ${scope} class="hero-motion-toggle" type="button" hidden>Pause background animation</button>`;
+        const clean = attributes.replace(/\sdata-motion-src="[^"]*"/g, '');
+        return `<div${clean} data-motion-src="${animation}">`;
       },
     );
     await route.fulfill({ response, body: html });
@@ -34,9 +34,10 @@ async function animatedHero(page: Page, broken = false) {
   return () => requests;
 }
 
-test('the supplied logo loads and the centered headline overlays the blurred placeholder', async ({
+test('the supplied logo loads and the centered headline overlays the original blurred artwork', async ({
   page,
 }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('/');
   const logos = page.locator('.brand-logo img');
   await expect(logos).toHaveCount(2);
@@ -90,7 +91,39 @@ test('the supplied logo loads and the centered headline overlays the blurred pla
   );
   await expect(
     page.getByRole('button', { name: /background animation/ }),
-  ).toHaveCount(0);
+  ).toBeHidden();
+});
+
+test('the original brand animation loads and can be paused', async ({
+  page,
+}) => {
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.goto('/');
+  const background = page.locator('[data-hero-image]');
+  await expect(background).toHaveAttribute('src', brandAnimation);
+  await expect(background).toHaveJSProperty('complete', true);
+  expect(
+    await background.evaluate((el: HTMLImageElement) => el.naturalWidth),
+  ).toBe(1600);
+  const pause = page.getByRole('button', {
+    name: 'Pause background animation',
+  });
+  await expect(pause).toBeVisible();
+  const playingBox = await page.locator('.hero').boundingBox();
+  await pause.click();
+  await expect(background).toHaveAttribute('src', poster);
+  await expect(page.locator('[data-hero-backdrop]')).toHaveAttribute(
+    'data-motion-state',
+    'paused',
+  );
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await expect(
+    page.getByRole('button', { name: /background animation/ }),
+  ).toBeHidden();
+  const reducedBox = await page.locator('.hero').boundingBox();
+  expect(playingBox).not.toBeNull();
+  expect(reducedBox).not.toBeNull();
+  expect(reducedBox!.height).toBe(playingBox!.height);
 });
 
 test('an optional GIF can be paused with the keyboard and respects a motion preference change', async ({

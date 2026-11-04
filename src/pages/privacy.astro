@@ -2,6 +2,8 @@
 import Base from '../layouts/Base.astro';
 import PageHero from '../components/PageHero.astro';
 const contactEnabled = import.meta.env.PUBLIC_CONTACT_ENABLED === 'true';
+const analyticsEnabled =
+  import.meta.env.PUBLIC_WEB_ANALYTICS_ENABLED === 'true';
 ---
 
 <Base
@@ -16,12 +18,38 @@ const contactEnabled = import.meta.env.PUBLIC_CONTACT_ENABLED === 'true';
   <section class="section">
     <div class="wrap prose privacy-copy">
       <h2>Website visits</h2>
+      {analyticsEnabled ? (
+        <p>
+          Prathersoftware.com uses Cloudflare Web Analytics to understand
+          aggregate page visits, referral sources, browser and device
+          information, and page-loading performance. The analytics loader
+          respects browsers that report Do Not Track. The website does not add
+          advertising trackers or attach contact-form contents to analytics.
+        </p>
+      ) : (
+        <p>
+          This website does not include advertising trackers or analytics
+          scripts.
+        </p>
+      )}
       <p>
-        This website does not include advertising trackers or analytics scripts.
         The hosting provider may process technical information such as IP
         addresses and request metadata to serve the website, maintain security,
         and diagnose errors.
       </p>
+      {analyticsEnabled && (
+        <p>
+          Read{' '}
+          <a
+            class="text-link"
+            href="https://developers.cloudflare.com/speed/observatory/rum-beacon/"
+            rel="noopener noreferrer"
+          >
+            how Cloudflare Web Analytics collects and processes data
+          </a>{' '}
+          for details.
+        </p>
+      )}
       <h2>Contact inquiries</h2>
       {contactEnabled ? (
         <p>
@@ -48,11 +76,14 @@ const contactEnabled = import.meta.env.PUBLIC_CONTACT_ENABLED === 'true';
       </p>
       <h2>Service providers and security</h2>
       <p>
-        Cloudflare processes technical information for hosting and, when
-        enabled, Turnstile verification and abuse prevention. Google processes
-        inquiry email through Google Workspace. The contact service does not
-        store inquiries in a database. Application logs record operational
-        errors without inquiry message bodies or email addresses.
+        Cloudflare processes technical information for hosting,
+        {analyticsEnabled ? ' Web Analytics,' : ''} and, when enabled, Turnstile
+        verification and abuse prevention. Google processes inquiry email
+        through Google Workspace. The contact service does not store inquiries
+        in a database. Application logs record operational errors without
+        inquiry message bodies or email addresses. Operational health markers
+        retain only an incident category and timestamp, without inquiry content
+        or visitor identifiers.
       </p>
       <p>
         Learn more from{' '}

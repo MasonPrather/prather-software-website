@@ -37,15 +37,16 @@ Automated accessibility checks do not establish complete WCAG conformance. Manua
 - `src/pages`: static page routes, collection detail templates, sitemap and robots endpoints.
 - `src/content.config.ts`, `src/content`: typed software/game collections. Only `published: true` entries generate public routes.
 - `src/lib/contact.ts`, `src/scripts/contact.ts`: shared validation/categories and accessible contact interaction.
-- `worker/`, `wrangler.jsonc`: a small Cloudflare Worker serving Astro's `dist/` assets and `/api/contact`.
+- `worker/`, `wrangler.jsonc`: a small Cloudflare Worker serving Astro's `dist/` assets, `/api/contact`, and public/private health probes.
 - `tests/`, `scripts/`: security, browser, accessibility, link and publication-gate regression checks.
 - `docs/cloudflare-staging.md`: environment, Turnstile, mail delivery, and staging checklist.
+- `docs/releases.md`, `docs/monitoring.md`, `docs/launch-readiness.md`: controlled releases, free monitoring, and operational setup status.
 
-The site remains static-first. Plain CSS and small browser scripts keep the design maintainable without a UI framework or unnecessary Tailwind dependency. No database, R2 bucket, analytics, or tracking library is needed for this milestone. An Astro server adapter is unnecessary: Cloudflare serves the generated static assets and the standalone Worker handles the contact route.
+The site remains static-first. Plain CSS and small browser scripts keep the design maintainable without a UI framework or unnecessary Tailwind dependency. No inquiry database, R2 bucket, or Astro server adapter is needed. Two separate free-tier KV namespaces retain only operational incident categories/timestamps. Optional manual Cloudflare Web Analytics measures aggregate visits/performance on the HTTPS production apex, respects Do Not Track, and stays off in verification/staging builds. No advertising or visitor-profile integration is included.
 
 ## Content and publication
 
-Research and personal portfolio entries have been removed at the owner’s request. The website focuses on client software services and independent games/apps. No clients, testimonials, staff, product releases, pricing, or partnerships have been invented. The owner-confirmed catalog lists Quest Theater under Software and Promenade, Rick Dangerman (& the Cuboids) Remastered, and Floor 13 under Games. All four products are unreleased. Quest Theater is marked Coming soon with a planned release week of November 2–8, 2026; the other three are In development. Prices and official store links remain unannounced on the site. Planned support is separate from current platforms, and Rick Dangerman’s controller/console plans remain conditional on success. Draft collection entries default to unpublished; published releases require an HTTPS store link, verified pricing (including Free), and platform metadata. Test products exist only in an automatically cleaned temporary directory.
+Research and personal portfolio entries have been removed at the owner’s request. The website focuses on client software services and independent games/apps. No clients, testimonials, staff, product releases, pricing, or partnerships have been invented. The owner-confirmed catalog lists Quest Theater under Software and Promenade, Rick Dangerman (& the Cuboids) Remastered, and Floor 13 under Games. All four products are unreleased. On November 4 the owner reconfirmed Quest Theater is unreleased; it remains Coming soon without an unconfirmed dated release window. The other three are In development. Prices and official store links remain unannounced. Factual FAQs explain the supplied platform and planned-support details; actual product screenshots/trailers are still needed. Rick Dangerman’s controller/console plans remain conditional on success. Draft collection entries default to unpublished; published releases require an HTTPS store link, verified pricing (including Free), and platform metadata. Test products exist only in an automatically cleaned temporary directory.
 
 The owner-supplied Prather Software logo is used in navigation, the footer, and social sharing. The design uses emerald green, near-black, and white. Founder information and the NinjaDawg label relationship come from the supplied source.
 
@@ -55,9 +56,9 @@ The original logo is preserved at `public/brand/prather-software-logo.jpg`. `Bra
 
 The owner-supplied diamond-P artwork is preserved unchanged at `public/brand/prather-diamond-icon.png`. `BrandIcon.astro` displays an optimized thumbnail beside the navigation wordmark. `Base.astro` links to the corresponding SVG favicon, 32px PNG fallback, and 180px touch icon under `public/brand/prather-diamond-icon*`; these new paths prevent browsers from reusing the previous favicon cache. The icon variants crop only surrounding whitespace and reuse the supplied artwork.
 
-The homepage centers large text over a blurred, darkened checkerboard placeholder. To replace it with animation, add a GIF under `public/images/` and set `animatedImage` in `src/data/hero.ts` to its root-relative URL (for example, `/images/homepage.gif`). Set `image` to a static still of that animation. `HeroBackdrop.astro` keeps the readability overlay and blur independent of the image; the text remains semantic HTML.
+The homepage centers large text over blurred, darkened original brand artwork. Local `hero-brand-static.svg` and `hero-brand-animated.svg` assets use the site's diamond/signal identity; they are decorative illustrations, not product screenshots. To use a GIF later, add it under `public/images/` and set `animatedImage` in `src/data/hero.ts` to its root-relative URL (for example, `/images/homepage.gif`). Set `image` to a static still of that animation. `HeroBackdrop.astro` keeps the readability overlay and blur independent of the image; the text remains semantic HTML.
 
-The static image is served first and remains in use without JavaScript or when reduced motion is requested. An animation gets a keyboard-accessible pause/play button and falls back to the still if it fails to load. The checkerboard is intentionally static until a real animation is supplied. Keep future media local, appropriately compressed, and free of flashing effects.
+The static image is served first and remains in use without JavaScript or when reduced motion is requested. An animation gets a keyboard-accessible pause/play button and falls back to the still if it fails to load. Control space is reserved before JavaScript loads to avoid a layout shift. The earlier checkerboard asset remains available for fallback experimentation. Keep future media local, appropriately compressed, and free of flashing effects.
 
 ## Contact and deployment gates
 
@@ -76,6 +77,7 @@ Checked-in public and server flags intentionally default off. Each authorized pr
 ```sh
 PUBLIC_CONTACT_ENABLED=true \
 PUBLIC_TURNSTILE_SITE_KEY=0x4AAAAAAFsABGQE4Na23nbs \
+PUBLIC_WEB_ANALYTICS_ENABLED=true \
 npm run build
 WRANGLER_WRITE_LOGS=false WRANGLER_LOG_SANITIZE=true \
 npx wrangler deploy --env production \

@@ -1,6 +1,6 @@
 # Cloudflare staging runbook
 
-Astro renders to `dist/`; the standalone Worker serves files through `ASSETS` and handles `/api/contact`. No SSR adapter, database, or R2 storage is needed. The default configuration targets **prather-software-staging**, at `staging.prathersoftware.com`, with workers.dev and version preview URLs disabled. Staging responses carry `X-Robots-Tag: noindex, nofollow`. The separately selected `production` environment enables indexing for successful public pages; API and error responses stay nonindexable. See [production operations](production.md) for the approved apex/www launch configuration.
+Astro renders to `dist/`; the standalone Worker serves files through `ASSETS` and handles contact and health endpoints. No SSR adapter, inquiry database, or R2 storage is needed. Separate staging/production KV namespaces retain only incident categories/timestamps for monitoring. The default configuration targets **prather-software-staging**, at `staging.prathersoftware.com`, with workers.dev and version preview URLs disabled. Staging responses carry `X-Robots-Tag: noindex, nofollow`. The separately selected `production` environment enables indexing for successful public pages; API and error responses stay nonindexable. See [production operations](production.md) for the approved apex/www launch configuration.
 
 ## Verified account and existing routing
 
@@ -37,6 +37,7 @@ Checked-in server gates intentionally default false in both environments. The ac
 ```sh
 PUBLIC_CONTACT_ENABLED=true \
 PUBLIC_TURNSTILE_SITE_KEY=0x4AAAAAAFsABGQE4Na23nbs \
+PUBLIC_WEB_ANALYTICS_ENABLED=true \
 npm run build
 WRANGLER_WRITE_LOGS=false WRANGLER_LOG_SANITIZE=true \
 npx wrangler deploy --env production \

@@ -37,6 +37,13 @@ try {
   }
   for (const name of ['package.json', 'astro.config.mjs', 'tsconfig.json'])
     await cp(path.join(root, name), path.join(fixture, name));
+  // The layout imports this public embed metadata even in disabled builds.
+  // Copy only the required public file, never private environment stores.
+  await mkdir(path.join(fixture, 'ops'));
+  await cp(
+    path.join(root, 'ops/web-analytics.json'),
+    path.join(fixture, 'ops/web-analytics.json'),
+  );
   await symlink(
     path.join(root, 'node_modules'),
     path.join(fixture, 'node_modules'),

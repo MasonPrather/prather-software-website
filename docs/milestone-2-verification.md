@@ -8,8 +8,8 @@ Latest full local verification passed on November 4, 2026 with Node 24.22.1, Ast
 - Owner-supplied logo and reusable emerald green/near-black/white design system, homepage business and publishing sections, four engineering categories, founder pages, collection-driven software/game catalogs and detail templates.
 - Page-specific descriptions, canonical URLs, Open Graph/Twitter image metadata, Organization structured data, sitemap and robots.
 - Separate staging/production Cloudflare Static Assets Worker configurations and gated contact service with bounded input, same-origin checks, Turnstile action/hostname verification, hashed-IP rate limiting, and provider-confirmed acceptance.
-- Owner-confirmed Quest Theater, Promenade, Rick Dangerman (& the Cuboids) Remastered, and Floor 13 listings with separate planned-support notes and owner-confirmed unreleased statuses (Quest Theater targets November 2–8, 2026); client services explicitly include SaaS, server support, AI integration, and contracted ongoing service.
-- Lockfile, formatter, strict type checks, regression tests, and GitHub Actions quality workflow. No deploy or DNS job exists.
+- Owner-confirmed Quest Theater, Promenade, Rick Dangerman (& the Cuboids) Remastered, and Floor 13 listings with separate planned-support notes and unreleased statuses; the owner reconfirmed Quest Theater is unreleased on November 4, so the unconfirmed dated release window has been removed. Client services explicitly include SaaS, server support, AI integration, and contracted ongoing service.
+- Lockfile, formatter, strict type checks, regression tests, and GitHub Actions quality workflow. Manual release and hourly monitoring workflows are implemented; activation status is recorded in [launch readiness](launch-readiness.md). No DNS automation job exists.
 
 ## Local checks
 

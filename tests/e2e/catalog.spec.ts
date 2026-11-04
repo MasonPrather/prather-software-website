@@ -69,13 +69,8 @@ for (const product of products) {
       await expect(page.locator('.planned-support')).toHaveCount(0);
     if (product.title === 'Quest Theater')
       await expect(
-        facts
-          .locator('div')
-          .filter({
-            has: page.locator('dt', { hasText: 'Planned release week' }),
-          })
-          .locator('dd'),
-      ).toHaveText('November 2–8, 2026');
+        facts.locator('dt', { hasText: 'Planned release week' }),
+      ).toHaveCount(0);
     if (product.title.startsWith('Rick Dangerman'))
       await expect(page.locator('.planned-support')).toContainText(
         'if the PC release is successful',

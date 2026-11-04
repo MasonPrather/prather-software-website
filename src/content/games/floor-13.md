@@ -14,3 +14,21 @@ order: 4
 On your way to an important meeting, you find yourself on a floor that does not exist in reality.
 
 Floor 13 is a VR suspense horror game built for Quest and PC VR.
+
+## Common questions
+
+### What is Floor 13 about?
+
+While on your way to an important meeting, you find yourself on a floor that does not exist in reality. The game centers on VR suspense and horror.
+
+### Which platforms is it being built for?
+
+Floor 13 is being built for Meta Quest and PC VR.
+
+### Is it available to play?
+
+Floor 13 is in development and has not been released. Official download links and pricing will be added when confirmed.
+
+### Where can I ask about Floor 13?
+
+Use the [contact form](/contact/) and choose Product support. Mention Floor 13 in your message.
