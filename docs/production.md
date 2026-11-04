@@ -15,25 +15,28 @@ Successful production pages allow indexing; staging, API responses, and errors r
 
 ## Release procedure
 
-Use the committed lockfile and Node 24 LTS. Do not deploy unreviewed local files or enable the contact form during a site release.
+Use the committed lockfile and Node 24 LTS. The verified contact form is now active. Preserve its explicit build settings and server flags during subsequent authorized releases; repository defaults remain disabled for local verification.
 
 ```sh
 npm ci
 npm run verify
 npm audit --audit-level=high
 npx wrangler whoami
-npx wrangler deploy --env production
+PUBLIC_CONTACT_ENABLED=true PUBLIC_TURNSTILE_SITE_KEY=0x4AAAAAAFsABGQE4Na23nbs npm run build
+npx wrangler deploy --env production --var CONTACT_ENABLED:true --var CONTACT_DELIVERY_VERIFIED:true
+npm run test:production -- --contact-enabled
+npm run test:production:browser -- --contact-enabled
 ```
 
 `verify` includes local staging/production runtime checks and dry runs for both configurations. The app connector and Wrangler CLI authenticate separately. Wrangler OAuth may store credentials in the OS Keychain with `--use-keyring`; never copy connector tokens or paste credentials into chat. Use the verified account above. Adding Custom Domains requires Workers Routes Write for the zone as well as Worker deployment access. Cloudflare provisions DNS and certificates for the exact Custom Domains; do not add wildcard routes.
 
-After deployment, verify HTTPS and all sitemap pages, static assets, canonical/OG metadata, robots/sitemap, www redirect, branded 404 status, security headers, production indexing, and contact unavailability. Check the existing privacy domain and its Worker metadata for unintended changes. Run `npm run test:production` and `npm run test:production:browser` against the deployed site and this exact `dist/` build. It compares all sitemap pages and non-HTML assets byte-for-byte, checks domain redirects and security headers, and sends one empty POST to confirm collection is disabled. It also prints the separate privacy page hash for comparison with the release baseline. This remote check is intentionally excluded from PR/local CI; update its disabled-contact expectation only after a separately verified activation. Record the deployed source commit and Cloudflare version ID below. A successful upload alone does not establish a working live site.
+After deployment, verify HTTPS and all sitemap pages, static assets, canonical/OG metadata, robots/sitemap, www redirect, branded 404 status, security headers, production indexing, and active contact configuration. Check the existing privacy domain and Worker metadata for unintended changes. Run both production checks with `--contact-enabled` against this exact `dist/` build. They compare live pages/assets, check the enabled UI and real Turnstile loading without submitting an inquiry, and print the separate privacy-page hash. The default check modes expect disabled collection and send one empty POST; use them only after a deliberate disable. These remote checks are excluded from PR/local CI. Record the deployed source commit and Cloudflare version ID below. Upload success does not establish a working live site.
 
-## Contact activation is a separate release
+## Current contact configuration
 
-`PUBLIC_CONTACT_ENABLED` stays false at build time. Production `CONTACT_ENABLED` and `CONTACT_DELIVERY_VERIFIED` stay false. The fixed candidate sender and recipient are `contact@prathersoftware.com`; Gmail authorization is not complete and no Gmail credentials are configured. The existing Turnstile secret is preserved. The contact page explains availability, and direct POST requests return 503 without calling external services.
+The live build has `PUBLIC_CONTACT_ENABLED=true` and the recorded production Turnstile sitekey. Both production server gates are true, and the three Gmail secrets plus the existing production Turnstile secret are configured. The fixed sender and notification destination are the authorized Workspace primary address `mason@prathersoftware.com`. The public contact address remains its alternate address `contact@prathersoftware.com`; direct primary delivery avoids Gmail's self-alias Inbox suppression. Visitor email is used only as a validated Reply-To. The application has only `gmail.send` authorization.
 
-Follow [the staging guide](cloudflare-staging.md) to configure separate Turnstile widgets, secrets, sender verification, privacy review, and a real accepted/inbox-tested message before activation. Mocked tests do not prove email delivery. No paid provider account has been created.
+Real staging and production submissions confirmed provider acceptance, and an immediate staging replay returned 403. Actual Inbox placement is still unconfirmed and must not be described as verified receipt. No paid provider account was created. Follow [the staging guide](cloudflare-staging.md) for future changes. Tracked configuration and example env files keep contact disabled; omitting the explicit activation flags or public build settings above will disable the form in a later deployment.
 
 ## Rollback
 
@@ -129,3 +132,16 @@ Validation: 95 unit tests, 180 browser tests, four workerd contact cases, format
 For production commands, use the configured `--env production` without a `--name` override. Wrangler appends the environment suffix to that override even when the environment already specifies its exact name. Verification caught an accidentally created empty, unrouted Worker; it was removed, and the actual production binding names were then verified. The separate privacy Worker/domain, five protected mail/privacy DNS records, and host-specific RUM exclusion matched the previous release before activation.
 
 The new optional `--contact-enabled` production-check modes are for a future verified activation. They do not send inquiries and cannot replace actual acceptance/inbox/replay evidence. The PR remains unmerged.
+
+### Active contact release
+
+Deployed on November 4, 2026 at `2026-11-04T15:24:23.086577Z` (approximately 10:24 AM America/New_York) under the owner's existing contact-setup and production-launch authorization.
+
+- Deployed source: `4daf17776404ec355ca9005222a8f83fb7b77a99`.
+- Production Worker version: `510d1a8e-e9be-43dc-89ca-960429e07278`, deployment `9c779a07-7f21-419b-8f93-8956d565014e`, serving 100% of traffic.
+- Both server gates and the public form are enabled. Remote settings confirm the primary sender/destination and exactly the four expected secret binding names. No secret values were read back.
+- A fresh real submission through the ordinary production form, identified as `PS-COM-20261104-01`, displayed provider-confirmed acceptance. No staging helper, synthetic Turnstile token, or bypass was used. Inbox placement remains unconfirmed; the owner has been asked to check the primary mailbox. The locked Mac prevented direct business-mail UI verification.
+- Enabled-mode live checks passed: 13 sitemap pages and 13 assets match the release build; HTTPS/www redirects, indexing, security headers, branded 404 and separate privacy availability passed. Live Chromium checks at 375/768/1440 px passed layout, automated WCAG AA checks, product navigation, active fields, real Turnstile frame loading, browser errors, and analytics exclusion.
+- [Release PR CI](https://github.com/MasonPrather/prather-software-website/actions/runs/41857323327) and [release push CI](https://github.com/MasonPrather/prather-software-website/actions/runs/41857313001) passed for this exact source.
+- Postrelease preservation checks match the preflight: all five protected mail/privacy DNS records, privacy Worker/domain and policy hash, and the RUM exclusion are unchanged. Only the three expected Workers remain. Staging stays disabled/nonindexable, and its temporary helper paths return 404.
+- The pull request remains open and unmerged. Physical-device and manual screen-reader checks, final hero media, and owner-confirmed product release/store information remain outside this verified release.
