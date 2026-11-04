@@ -39,9 +39,11 @@ See [monitoring](monitoring.md) and [releases](releases.md) for operation, tests
 
 ## Account ownership
 
-Public RDAP reports Cloudflare as registrar, a transfer-prohibited lock, and expiry on October 13, 2027. Auto-renewal and billing/recovery details still need owner verification; no renewal or payment setting was changed.
+Public RDAP reports Cloudflare as registrar, a transfer-prohibited lock, and expiry on October 13, 2027. A subsequent read-only Registrar API check confirmed an active registration and automatic renewal enabled. The payment method and account recovery details still need owner verification; no renewal or payment setting was changed.
 
 Cloudflare's user API initially reported two-factor authentication disabled. The owner has been asked to enroll privately and close any authenticator/recovery-code screens before further automation. GitHub and Google MFA status and recovery-code storage have not been verified. Do not print passwords, enrollment QR secrets, recovery keys, or API credentials into chat or Git.
+
+The read-only zone audit found TLS 1.3 enabled, minimum TLS 1.0, SSL mode Full, and DNSSEC disabled. The website already redirects HTTP to HTTPS in its Worker. Full (strict) concerns certificate validation for proxied origins; these website Workers have no separate origin server. Raising the zone minimum to TLS 1.2 and enabling DNSSEC are additional hardening options, not completed changes. Review all affected hostnames and the Cloudflare Registrar DNSSEC workflow before changing them. Mail DNS and the separate privacy site remain preserved.
 
 ## Visitor experience and remaining owner input
 
