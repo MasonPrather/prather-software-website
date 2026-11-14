@@ -1,0 +1,130 @@
+---
+import Base from '../layouts/Base.astro';
+
+const description =
+  'An early Windows build of the Director’s Cut tower prototype. Play through the first two floors solo or with a friend in private co-op.';
+---
+
+<Base
+  title="Director’s Cut: Tower Prototype | Prather Software"
+  description={description}
+  noindex
+>
+  <section class="section">
+    <div class="wrap tower-page">
+      <p class="eyebrow">Prather Software / Game prototype</p>
+      <h1>
+        Director’s Cut:
+        <br />
+        Tower Prototype
+      </h1>
+      <p class="version">Alpha 0.1 · Windows 11 (64-bit)</p>
+      <p class="description">{description}</p>
+      <div class="download-area">
+        <a
+          class="download-button"
+          href="https://downloads.prathersoftware.com/DirectorCut-TowerPrototype-Alpha-0.1-Win64.zip"
+        >
+          Download Alpha 0.1 for Windows (ZIP)
+        </a>
+        <p class="availability">ZIP size: 472 MiB (494,430,839 bytes)</p>
+      </div>
+      <section class="instructions" aria-labelledby="playtest-heading">
+        <h2 id="playtest-heading">Setup</h2>
+        <ol>
+          <li>Download the ZIP and choose “Extract All.”</li>
+          <li>
+            Open the extracted folder and run <code>EpicAIMegaJam.exe</code>.
+          </li>
+          <li>
+            Choose <strong>New Game</strong> to start playing solo.
+          </li>
+          <li>
+            To join a friend, use the Expedition Table in the hub, choose{' '}
+            <strong>Private Co-op → Join Room</strong>, and paste the host’s
+            room code. Both players need the same Alpha 0.1 build. For play
+            across different networks, the host handles connection setup. The
+            guest only needs the game and the room code.
+          </li>
+        </ol>
+      </section>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .tower-page {
+    max-width: 850px;
+    padding-block: clamp(28px, 6vw, 72px);
+  }
+  h1 {
+    max-width: 780px;
+  }
+  .version {
+    display: inline-block;
+    margin: 0 0 24px;
+    padding: 7px 12px;
+    border: 1px solid var(--line);
+    border-radius: 2px;
+    color: var(--brand);
+    font: 600 0.76rem/1.4 var(--mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .description {
+    max-width: 740px;
+    color: var(--muted);
+    font-size: clamp(1.05rem, 2vw, 1.2rem);
+    line-height: 1.8;
+  }
+  .download-area {
+    margin-top: 34px;
+  }
+  .download-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: min(100%, 390px);
+    min-height: 58px;
+    padding: 15px 22px;
+    border: 0;
+    border-radius: 2px;
+    background: var(--brand);
+    color: var(--white);
+    font-weight: 650;
+    font-size: 1rem;
+    text-align: center;
+    text-decoration: none;
+  }
+  .download-button:hover {
+    background: var(--brand-hover);
+  }
+  .availability {
+    margin: 12px 0 0;
+    color: var(--muted);
+    font-size: 0.9rem;
+    overflow-wrap: anywhere;
+  }
+  .instructions {
+    max-width: 760px;
+    margin-top: clamp(36px, 7vw, 64px);
+    padding-top: 28px;
+    border-top: 1px solid var(--line);
+  }
+  .instructions h2 {
+    margin-block: 10px 20px;
+    font-size: clamp(1.65rem, 3.5vw, 2.4rem);
+  }
+  .instructions ol {
+    display: grid;
+    gap: 12px;
+    padding-left: 1.5rem;
+    color: var(--muted);
+  }
+  .instructions li {
+    padding-left: 0.25rem;
+  }
+  .instructions strong {
+    color: var(--ink);
+  }
+</style>
