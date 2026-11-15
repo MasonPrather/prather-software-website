@@ -2,7 +2,7 @@
 import Base from '../layouts/Base.astro';
 
 const description =
-  'An early Windows build of the Director’s Cut tower prototype. Play through the first two floors solo or with a friend in private co-op.';
+  'An early Windows build of the Director’s Cut tower roguelike. Explore its tower floors solo or team up with a friend using private room-code co-op.';
 ---
 
 <Base
@@ -18,21 +18,23 @@ const description =
         <br />
         Tower Prototype
       </h1>
-      <p class="version">Alpha 0.1 · Windows 11 (64-bit)</p>
+      <p class="version">Alpha 0.2 · Windows 11 (64-bit)</p>
       <p class="description">{description}</p>
       <div class="download-area">
         <a
           class="download-button"
-          href="https://downloads.prathersoftware.com/DirectorCut-TowerPrototype-Alpha-0.1-Win64.zip"
+          href="https://downloads.prathersoftware.com/Directors-Cut-Alpha-0.2-Win64-Development.zip"
         >
-          Download Alpha 0.1 for Windows (ZIP)
+          Download Alpha 0.2 for Windows
         </a>
-        <p class="availability">ZIP size: 472 MiB (494,430,839 bytes)</p>
+        <p class="availability">ZIP size: 608.7 MiB (637,868,409 bytes)</p>
       </div>
       <section class="instructions" aria-labelledby="playtest-heading">
         <h2 id="playtest-heading">Setup</h2>
         <ol>
-          <li>Download the ZIP and choose “Extract All.”</li>
+          <li>
+            Download the ZIP and choose <strong>Extract All</strong>.
+          </li>
           <li>
             Open the extracted folder and run <code>EpicAIMegaJam.exe</code>.
           </li>
@@ -41,13 +43,26 @@ const description =
           </li>
           <li>
             To join a friend, use the Expedition Table in the hub, choose{' '}
-            <strong>Private Co-op → Join Room</strong>, and paste the host’s
-            room code. Both players need the same Alpha 0.1 build. For play
-            across different networks, the host handles connection setup. The
-            guest only needs the game and the room code.
+            <strong>Private Co-op → Join Room</strong>, and enter the host’s
+            room code. Both players need the same Alpha 0.2 build.
           </li>
         </ol>
+        <p class="playtest-note">
+          For the three-floor preview, run this from the extracted folder:
+          <code>
+            EpicAIMegaJam.exe -JamProceduralTower -JamFoundrySlice
+            -saveddirsuffix=JamWinAlpha02
+          </code>
+          . Private room-code co-op is a playtest feature; the two-PC and WAN
+          checks are still pending.
+        </p>
       </section>
+      <details class="older-builds">
+        <summary>Older builds</summary>
+        <a href="https://downloads.prathersoftware.com/DirectorCut-TowerPrototype-Alpha-0.1-Win64.zip">
+          Alpha 0.1 for Windows
+        </a>
+      </details>
     </div>
   </section>
 </Base>
@@ -126,5 +141,28 @@ const description =
   }
   .instructions strong {
     color: var(--ink);
+  }
+  .playtest-note {
+    max-width: 760px;
+    color: var(--muted);
+    line-height: 1.8;
+    overflow-wrap: anywhere;
+  }
+  .playtest-note code {
+    color: var(--ink);
+  }
+  .older-builds {
+    margin-top: 30px;
+    color: var(--muted);
+    font-size: 0.78rem;
+  }
+  .older-builds summary {
+    width: fit-content;
+    cursor: pointer;
+  }
+  .older-builds a {
+    display: inline-block;
+    margin: 8px 0 0 14px;
+    color: var(--muted);
   }
 </style>
