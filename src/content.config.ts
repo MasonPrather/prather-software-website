@@ -1,0 +1,52 @@
+import { defineCollection } from 'astro:content';
+import { z } from 'astro/zod';
+import { glob } from 'astro/loaders';
+const text = z.string().trim().min(1);
+const productSchema = z
+  .object({
+    title: text,
+    summary: text.max(240),
+    status: z.enum(['In development', 'Coming soon', 'Released']),
+    productType: text.max(80).optional(),
+    releaseWindow: text.max(120).optional(),
+    plannedSupport: z.array(text).default([]),
+    roadmapNote: text.max(300).optional(),
+    publishingLabel: text.optional(),
+    featured: z.boolean().default(false),
+    platforms: z.array(text).min(1),
+    price: text.optional(),
+    storeUrl: z
+      .url()
+      .refine(
+        (value) => value.startsWith('https://'),
+        'Public product links must use HTTPS.',
+      )
+      .optional(),
+    cover: z.string().startsWith('/').optional(),
+    published: z.boolean().default(false),
+    order: z.number().int().default(100),
+  })
+  .superRefine((product, context) => {
+    if (product.status === 'Released' && !product.storeUrl)
+      context.addIssue({
+        code: 'custom',
+        message: 'Released products require a verified HTTPS store URL.',
+        path: ['storeUrl'],
+      });
+    if (product.status === 'Released' && !product.price)
+      context.addIssue({
+        code: 'custom',
+        message:
+          'Released products require verified pricing, including Free where applicable.',
+        path: ['price'],
+      });
+  });
+const software = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/software' }),
+  schema: productSchema,
+});
+const games = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/games' }),
+  schema: productSchema,
+});
+export const collections = { software, games };

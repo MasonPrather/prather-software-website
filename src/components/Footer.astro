@@ -1,0 +1,116 @@
+---
+import BrandLogo from './BrandLogo.astro';
+---
+
+<footer class="footer">
+  <div class="wrap footer-grid">
+    <div>
+      <a class="footer-brand" href="/" aria-label="Prather Software home">
+        <BrandLogo />
+      </a>
+      <p>
+        Practical engineering.
+        <br />
+        Independent thinking.
+      </p>
+    </div>
+    <div class="footer-links">
+      <p class="footer-label">ENGINEERING</p>
+      <a href="/services/">Our services</a>
+      <a href="/contact/">Start a conversation</a>
+    </div>
+    <div class="footer-links">
+      <p class="footer-label">PUBLISHING</p>
+      <a href="/products/software/">Software</a>
+      <a href="/products/games/">NinjaDawg Studios</a>
+      <a href="/about/">About us</a>
+    </div>
+  </div>
+  <div class="wrap footer-bottom">
+    <p>© {new Date().getFullYear()} Prather Software LLC</p>
+    <a href="/privacy/">Privacy</a>
+    <span>DESIGN / DEVELOP / DEPLOY</span>
+  </div>
+</footer>
+<style>
+  .footer {
+    padding: 70px 0 24px;
+  }
+  .footer-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 36px;
+  }
+  .footer-brand {
+    display: block;
+    width: min(280px, 100%);
+    padding: 12px;
+    background: white;
+    text-decoration: none;
+  }
+  .footer-grid > div > p {
+    color: var(--muted-on-dark);
+    font-size: 15px;
+    line-height: 1.8;
+    margin-top: 20px;
+  }
+  .footer-links {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 13px;
+  }
+  .footer-links .footer-label {
+    font: 11px var(--mono);
+    letter-spacing: 0.13em;
+    color: var(--muted-on-dark);
+    margin: 0 0 7px;
+  }
+  .footer-links a {
+    font-size: 14px;
+    min-height: 24px;
+  }
+  .footer-bottom {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+    border-top: 1px solid var(--line-on-dark);
+    margin-top: 58px;
+    padding-top: 24px;
+    font-size: 12px;
+    color: var(--muted-on-dark);
+  }
+  .footer-bottom p {
+    margin: 0;
+  }
+  .footer-bottom > span {
+    margin-left: auto;
+    font: 10px var(--mono);
+    letter-spacing: 0.1em;
+  }
+  .footer-bottom a {
+    min-height: 24px;
+    display: flex;
+    align-items: center;
+  }
+  @media (max-width: 650px) {
+    .footer-grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 35px 20px;
+    }
+    .footer-grid > div:first-child {
+      grid-column: 1/-1;
+    }
+    .footer-bottom {
+      flex-wrap: wrap;
+      gap: 14px 20px;
+    }
+    .footer-bottom > span {
+      width: 100%;
+      margin-left: 0;
+    }
+    .footer {
+      padding-top: 55px;
+    }
+  }
+</style>

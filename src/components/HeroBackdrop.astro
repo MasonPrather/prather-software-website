@@ -1,0 +1,95 @@
+---
+import { heroMedia } from '../data/hero';
+
+interface Props {
+  image?: string;
+  animatedImage?: string;
+}
+
+const { image = heroMedia.image, animatedImage = heroMedia.animatedImage } =
+  Astro.props;
+---
+
+<div
+  class="hero-backdrop"
+  data-hero-backdrop
+  data-static-src={image}
+  data-motion-src={animatedImage}
+>
+  <div class="hero-backdrop-visual" aria-hidden="true">
+    <img
+      data-hero-image
+      src={image}
+      alt=""
+      width="1600"
+      height="1000"
+      decoding="async"
+    />
+  </div>
+  {animatedImage && (
+    <button class="hero-motion-toggle" type="button" hidden>
+      Pause background animation
+    </button>
+  )}
+</div>
+
+<script>
+  import '../scripts/hero-media';
+</script>
+
+<style>
+  .hero-backdrop {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .hero-backdrop-visual {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    background: #0b1b1b;
+  }
+  .hero-backdrop-visual::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: #061613b8;
+  }
+  .hero-backdrop img {
+    position: absolute;
+    inset: -20px;
+    width: calc(100% + 40px);
+    max-width: none;
+    height: calc(100% + 40px);
+    object-fit: cover;
+    object-position: center;
+    filter: blur(6px);
+  }
+  .hero-motion-toggle {
+    position: absolute;
+    right: 24px;
+    bottom: 20px;
+    z-index: 2;
+    min-height: 44px;
+    padding: 10px 14px;
+    border: 1px solid #b6cec1;
+    border-radius: 1px;
+    color: white;
+    background: #0b1b1b;
+    font-size: 0.75rem;
+    pointer-events: auto;
+  }
+  .hero-motion-toggle:hover {
+    background: #234537;
+  }
+  .hero-motion-toggle[hidden] {
+    display: none;
+  }
+  @media (max-width: 750px) {
+    .hero-motion-toggle {
+      bottom: 16px;
+      right: 20px;
+    }
+  }
+</style>

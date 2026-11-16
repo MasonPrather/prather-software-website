@@ -1,0 +1,16 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { getCollection } from 'astro:content';
+import ProductDetail from '../../../components/ProductDetail.astro';
+export async function getStaticPaths() {
+  return (await getCollection('software', ({ data }) => data.published)).map(
+    (entry) => ({ params: { slug: entry.id }, props: { entry } }),
+  );
+}
+interface Props {
+  entry: CollectionEntry<'software'>;
+}
+const { entry } = Astro.props;
+---
+
+<ProductDetail entry={entry} category="software" />

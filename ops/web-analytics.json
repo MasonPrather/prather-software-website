@@ -1,0 +1,12 @@
+{
+  "account_id": "901d7b0a79a15aaa0f84fbca1bbb2ad5",
+  "hostname": "prathersoftware.com",
+  "site_tag": "fa9e917c4a2941989df7fa41654f13d3",
+  "site_token": "11286e70dadc447cb11a4abd4343c17d",
+  "auto_install": false,
+  "mode": "manual",
+  "script_url": "https://static.cloudflareinsights.com/beacon.min.js",
+  "collection_origin": "https://cloudflareinsights.com",
+  "respects_do_not_track": true,
+  "provisioned_at": "2026-11-04"
+}
