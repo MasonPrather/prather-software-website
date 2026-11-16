@@ -2,63 +2,61 @@
 import Base from '../layouts/Base.astro';
 
 const description =
-  'An early Windows build of the Director’s Cut tower roguelike. Explore its tower floors solo or team up with a friend using private room-code co-op.';
+  'The Waystone asks what you lost. Climb a shifting tower to reclaim it. Choose a starting weapon, fight through three floors, and collect four keys on each floor to open the boss gate.';
+
+const windowsUrl =
+  'https://downloads.prathersoftware.com/what-the-tower-keeps/alpha-0.3/windows/Directors-Cut-Alpha-0.3-Win64-Development.zip';
+const macUrl =
+  'https://downloads.prathersoftware.com/what-the-tower-keeps/alpha-0.3/macos/PratherSoftware_WhatTheTowerKeeps.zip';
 ---
 
 <Base
-  title="Director’s Cut: Tower Prototype | Prather Software"
+  title="What the Tower Keeps — Alpha 0.3 | Prather Software"
   description={description}
   noindex
 >
   <section class="section">
     <div class="wrap tower-page">
       <p class="eyebrow">Prather Software / Game prototype</p>
-      <h1>
-        Director’s Cut:
-        <br />
-        Tower Prototype
-      </h1>
-      <p class="version">Alpha 0.2 · Windows 11 (64-bit)</p>
+      <h1>What the Tower Keeps</h1>
       <p class="description">{description}</p>
-      <div class="download-area">
-        <a
-          class="download-button"
-          href="https://downloads.prathersoftware.com/Directors-Cut-Alpha-0.2-Win64-Development.zip"
-        >
-          Download Alpha 0.2 for Windows
-        </a>
-        <p class="availability">ZIP size: 608.7 MiB (637,868,409 bytes)</p>
-      </div>
-      <section class="instructions" aria-labelledby="playtest-heading">
-        <h2 id="playtest-heading">Setup</h2>
-        <ol>
-          <li>
-            Download the ZIP and choose <strong>Extract All</strong>.
-          </li>
-          <li>
-            Open the extracted folder and run <code>EpicAIMegaJam.exe</code>.
-          </li>
-          <li>
-            Choose <strong>New Game</strong> to start playing solo.
-          </li>
-          <li>
-            To join a friend, use the Expedition Table in the hub, choose{' '}
-            <strong>Private Co-op → Join Room</strong>, and enter the host’s
-            room code. Both players need the same Alpha 0.2 build.
-          </li>
-        </ol>
-        <p class="playtest-note">
-          For the three-floor preview, run this from the extracted folder:
-          <code>
-            EpicAIMegaJam.exe -JamProceduralTower -JamFoundrySlice
-            -saveddirsuffix=JamWinAlpha02
-          </code>
-          . Private room-code co-op is a playtest feature; the two-PC and WAN
-          checks are still pending.
-        </p>
+
+      <section class="downloads" aria-label="Alpha 0.3 downloads">
+        <div class="download-option primary-option">
+          <h2>
+            Windows 64-bit <span>Alpha 0.3</span>
+          </h2>
+          <a class="download-button" href={windowsUrl}>
+            Download Alpha 0.3 for Windows
+          </a>
+          <p class="availability">ZIP size: 719.5 MiB (754,312,433 bytes)</p>
+          <p class="setup">
+            Extract the entire ZIP, then run <code>Play Directors Cut.cmd</code>
+            from the extracted folder.
+          </p>
+        </div>
+
+        <div class="download-option secondary-option">
+          <h2>
+            macOS <span>Alpha 0.3</span>
+          </h2>
+          <a class="download-button secondary-button" href={macUrl}>
+            Download Alpha 0.3 for macOS
+          </a>
+          <p class="availability">ZIP size: 643.1 MiB (674,336,637 bytes)</p>
+          <p class="setup">
+            Extract the entire ZIP, then open{' '}
+            <code>Play What the Tower Keeps.command</code>. Keep the launcher
+            next to <code>EpicAIMegaJam.app</code>.
+          </p>
+        </div>
       </section>
+
       <details class="older-builds">
         <summary>Older builds</summary>
+        <a href="https://downloads.prathersoftware.com/Directors-Cut-Alpha-0.2-Win64-Development.zip">
+          Alpha 0.2 for Windows
+        </a>
         <a href="https://downloads.prathersoftware.com/DirectorCut-TowerPrototype-Alpha-0.1-Win64.zip">
           Alpha 0.1 for Windows
         </a>
@@ -66,7 +64,6 @@ const description =
     </div>
   </section>
 </Base>
-
 <style>
   .tower-page {
     max-width: 850px;
@@ -75,34 +72,43 @@ const description =
   h1 {
     max-width: 780px;
   }
-  .version {
-    display: inline-block;
-    margin: 0 0 24px;
-    padding: 7px 12px;
-    border: 1px solid var(--line);
-    border-radius: 2px;
-    color: var(--brand);
-    font: 600 0.76rem/1.4 var(--mono);
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
   .description {
     max-width: 740px;
     color: var(--muted);
     font-size: clamp(1.05rem, 2vw, 1.2rem);
     line-height: 1.8;
   }
-  .download-area {
+  .downloads {
+    display: grid;
+    gap: clamp(24px, 5vw, 40px);
+    max-width: 760px;
     margin-top: 34px;
   }
+  .download-option {
+    min-width: 0;
+  }
+  .download-option h2 {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 10px 14px;
+    margin: 0 0 14px;
+    font-size: clamp(1.3rem, 3vw, 1.7rem);
+  }
+  .download-option h2 span {
+    color: var(--muted);
+    font: 600 0.72rem/1.4 var(--mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
   .download-button {
-    display: inline-flex;
+    display: flex;
     align-items: center;
     justify-content: center;
-    width: min(100%, 390px);
+    width: min(100%, 430px);
     min-height: 58px;
     padding: 15px 22px;
-    border: 0;
+    border: 1px solid var(--brand);
     border-radius: 2px;
     background: var(--brand);
     color: var(--white);
@@ -114,54 +120,40 @@ const description =
   .download-button:hover {
     background: var(--brand-hover);
   }
-  .availability {
-    margin: 12px 0 0;
+  .secondary-button {
+    background: transparent;
+    color: var(--brand);
+  }
+  .secondary-button:hover {
+    background: color-mix(in srgb, var(--brand) 8%, transparent);
+  }
+  .availability,
+  .setup {
+    max-width: 650px;
+    margin: 11px 0 0;
     color: var(--muted);
     font-size: 0.9rem;
+    line-height: 1.7;
     overflow-wrap: anywhere;
   }
-  .instructions {
-    max-width: 760px;
-    margin-top: clamp(36px, 7vw, 64px);
-    padding-top: 28px;
-    border-top: 1px solid var(--line);
+  .setup {
+    margin-top: 14px;
+    font-size: 1rem;
   }
-  .instructions h2 {
-    margin-block: 10px 20px;
-    font-size: clamp(1.65rem, 3.5vw, 2.4rem);
-  }
-  .instructions ol {
-    display: grid;
-    gap: 12px;
-    padding-left: 1.5rem;
-    color: var(--muted);
-  }
-  .instructions li {
-    padding-left: 0.25rem;
-  }
-  .instructions strong {
-    color: var(--ink);
-  }
-  .playtest-note {
-    max-width: 760px;
-    color: var(--muted);
-    line-height: 1.8;
-    overflow-wrap: anywhere;
-  }
-  .playtest-note code {
+  .setup code {
     color: var(--ink);
   }
   .older-builds {
-    margin-top: 30px;
+    width: fit-content;
+    margin-top: 34px;
     color: var(--muted);
     font-size: 0.78rem;
   }
   .older-builds summary {
-    width: fit-content;
     cursor: pointer;
   }
   .older-builds a {
-    display: inline-block;
+    display: block;
     margin: 8px 0 0 14px;
     color: var(--muted);
   }
